@@ -28,6 +28,14 @@ class Matrix
         T& operator()(int x, int y, int z)
         { return data[x*w*c + y*c + z]; }
 
+        T& operator()(int x, int y)
+        { return data[x*w + y]; }
+
+        T get(int x, int y, int z) const
+        { return data[x*w*c + y*c + z]; }
+
+        T get(int x, int y) const
+        { return data[x*w + y]; }
 };
 
 class Matrixf
@@ -43,6 +51,7 @@ class Matrixf
             for(int i = 0; i < h; i++)
                 for(int j = 0; j < w; j++)
                 {
+                    //cv::Mat is in [h][w][3] format, so convert it into 1d vector
                     Vec3b color = img.at<Vec3b>(i, j);
                     for(int k = 0; k < c; k++)
                         data[i * w * c + j * c + k] = static_cast<float>(color[k]);
@@ -51,6 +60,7 @@ class Matrixf
 
         float* toArray(float out[8], int i, int j) const
         {
+            //helper function specifically for buffer writing
             for(int l = 0; l < 8; l++)
                 out[l] = data[i * w * c + j * c + l];
             return out;
@@ -75,6 +85,7 @@ class Matrixf
 const int INITIAL = 0, ACTIVE = 1, EXPANDED = 2;
 class Pnode: public FibHeapNode
 {
+    //Just follow the fibtest.cpp sample in the fibheap library
     public:
         Point pt;
         int state;
@@ -82,7 +93,7 @@ class Pnode: public FibHeapNode
         float linkCost[8]; 
         Pnode *prevNode;
 
-        Pnode(Point p, const float c[8]): FibHeapNode(), pt(p), state(INITIAL), totalCost(0.0f), prevNode(NULL)
+        Pnode(Point p, const float c[8]): FibHeapNode(), pt(p), state(INITIAL), totalCost(1e9), prevNode(NULL)
         { for(int i = 0; i < 8; i++) linkCost[i] = c[i]; }
 
         virtual void operator=(FibHeapNode& RHS)
