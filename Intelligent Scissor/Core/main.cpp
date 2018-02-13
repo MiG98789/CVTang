@@ -104,7 +104,7 @@ Matrix<Point> wire(const Point& seed, const Matrixf& cost)
     vector<Pnode *> nodes;
     for(int i = 0; i < h; i++)
         for(int j = 0; j < w; j++)
-            nodes.push_back(new Pnode(Point(j, i), cost.toArray(buf, j, i)));
+            nodes.push_back(new Pnode(Point(j, i), cost.toArray(buf, i, j)));
 
     //Init seed node
     nodes[seed.y*w + seed.x]->totalCost = 0.0f;
