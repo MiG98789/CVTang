@@ -123,4 +123,18 @@ class Pnode: public FibHeapNode
         }
 };
 
+struct Path
+{
+    vector<Point> seeds;
+    vector<vector<Point> > trail;
+    vector<Point> mouse;
+    Point cursor;
+    bool lock = false;
+};
+
+struct MouseParam
+{
+    Path* p;
+    bool click;
+};
 #endif

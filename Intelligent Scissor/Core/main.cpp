@@ -86,8 +86,8 @@ int neighborCost(const Matrixf& cost, Point q, Point r)
     if(q == r)
         return -1;
     int mapping[3][3] = {{3,  2, 1},
-                         {4, -1, 0},
-                         {5,  6, 7}};
+        {4, -1, 0},
+        {5,  6, 7}};
     int x = r.x - q.x + 1;
     int y = r.y - q.y + 1;
     return cost.get(q.y, q.x, mapping[y][x]);
@@ -158,39 +158,67 @@ Matrix<Point> wire(const Point& seed, const Matrixf& cost)
     return path;
 }
 
-void draw(Mat& canvas, const Mat& image, const Point& seed_pt, const Point& move_pt, const Matrix<Point>& path)
+void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
 {
+    p.lock = true;
     canvas = image.clone();
-    Point curr_pt = move_pt;
-    while(curr_pt != seed_pt)
+
+    for(int i = 0; i < p.trail.size(); i++)
+        for(int j = 0; j < (int)p.trail[i].size() - 1; j++)
+            line(canvas, p.trail[i][j], p.trail[i][j+1], Scalar(0, 0, 255), 2);
+
+    if(p.seeds.size() > 0)
     {
-        //path(i, j) is the next pixel position to link to from Point(j, i) ps. Point uses (x, y) so has to flip ij
-        Point prev_pt = path.get(curr_pt.y, curr_pt.x);
-        line(canvas, curr_pt, prev_pt, Scalar(0, 0, 255), 2);
-        curr_pt = prev_pt;
+        Point seed = p.seeds.back();
+        Point curr = p.cursor;
+        p.mouse.clear();
+        while(curr != seed)
+        {
+            p.mouse.push_back(curr);
+            //path(i, j) is the next pixel position to link to from Point(j, i) ps. Point uses (x, y) so has to flip ij
+            Point prev = link.get(curr.y, curr.x);
+            line(canvas, curr, prev, Scalar(0, 0, 255), 2);
+            curr = prev;
+        }
+        
+        for(int i = 0; i < p.seeds.size(); i++)
+            circle(canvas, p.seeds[i], 3, Scalar(0, 255, 0), -1);
     }
+    p.lock = false;
 }
 
-Point prev_pt = Point(-1, -1);
-Point seed_pt = Point(-1, -1);
-Point move_pt = Point(-1, -1);
 void mouseCallback(int event, int x, int y, int flags, void* userdata)
 {
+    MouseParam* mp = (MouseParam*)userdata;
+    while(mp->p->lock);
     if(event == EVENT_LBUTTONUP)
     {
-        cout << "LBUTTON UP " << x << " " << y << endl;
-        //Set seed point to trigger path tree compute
-        seed_pt = seed_pt.x == -1? Point(x, y): Point(-1, -1);
+        if(mp->p->seeds.size() > 0 && abs(x - mp->p->seeds[0].x) + abs(y - mp->p->seeds[0].y) < 10)
+            mp->p->seeds.clear();
+        else
+            //Set seed point to trigger path tree compute
+            mp->p->seeds.push_back(Point(x, y));
+        mp->click = true;
+    }
+    else if(event == EVENT_MBUTTONUP)
+    {
+        //Reset all points when middle mouse click
+        mp->p->seeds.clear();
+        mp->p->trail.clear();
+        mp->p->mouse.clear();
     }
     else if(event == EVENT_MOUSEMOVE)
-        move_pt = Point(x, y);
+        mp->p->cursor = Point(x, y);
 }
 
 int main()
 {
+    Path p;
+    MouseParam mp = {&p, false};
+
     namedWindow("Image", WINDOW_AUTOSIZE);
     moveWindow("Image", 1000, 0);
-    setMouseCallback("Image", mouseCallback, NULL);
+    setMouseCallback("Image", mouseCallback, (void*)&mp);
 
     Mat canvas, image = imread("curless.png", CV_LOAD_IMAGE_COLOR);
     resize(image, image, Size(), 0.5, 0.5);
@@ -198,24 +226,42 @@ int main()
 
     Mat vis = visualize(image, c);
 
-    Matrix<Point> path(image.rows, image.cols);
+    Matrix<Point> link(image.rows, image.cols);
 
     while(1)
     {
-        if(seed_pt.x != -1 && seed_pt != prev_pt)
+        if(mp.click)
         {
-            path = wire(seed_pt, c);
-            prev_pt = seed_pt;
+            reverse(p.mouse.begin(), p.mouse.end());
+            p.trail.push_back(p.mouse);
+            link = wire(p.seeds.back(), c);
+            mp.click = false;
         }
 
         //Continous drawing of lasso lines
-        if(seed_pt.x != -1)
-            draw(canvas, image, seed_pt, move_pt, path);
-        else
-            canvas = image.clone();
+        draw(canvas, image, p, link);
 
         imshow("Image", canvas);
-        if((char)waitKey(1) == 'q') break;
+        char key = (char)waitKey(1);
+        if(key == 'q')
+            break;
+        else if(key == 8)
+        {
+            if(p.seeds.size() > 0)
+            {
+                p.seeds.pop_back();
+                p.trail.pop_back();
+                link = wire(p.seeds.back(), c);
+            }
+        }
+        else if(key == 's')
+        {
+            for(int i = 0; i < p.trail.size(); i++)
+                for(int j = 0; j < p.trail[i].size(); j++)
+                    cout << p.trail[i][j] << " ";
+            cout << endl;
+        }
+        
     }
 
     return 0;
