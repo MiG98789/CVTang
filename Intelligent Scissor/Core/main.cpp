@@ -163,6 +163,7 @@ void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
     p.lock = true;
     canvas = image.clone();
 
+    //draw lines for all previously recorded seed point to seed point trails
     for(int i = 0; i < p.trail.size(); i++)
         for(int j = 0; j < (int)p.trail[i].size() - 1; j++)
             line(canvas, p.trail[i][j], p.trail[i][j+1], Scalar(0, 0, 255), 2);
@@ -171,6 +172,7 @@ void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
     {
         Point seed = p.seeds.back();
         Point curr = p.cursor;
+        //re-initialize last-seed-point to cursor trail
         p.mouse.clear();
         while(curr != seed)
         {
@@ -181,6 +183,7 @@ void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
             curr = prev;
         }
         
+        //Put emphasis on seed points by drawing green dots
         for(int i = 0; i < p.seeds.size(); i++)
             circle(canvas, p.seeds[i], 3, Scalar(0, 255, 0), -1);
     }
@@ -193,11 +196,8 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata)
     while(mp->p->lock);
     if(event == EVENT_LBUTTONUP)
     {
-        if(mp->p->seeds.size() > 0 && abs(x - mp->p->seeds[0].x) + abs(y - mp->p->seeds[0].y) < 10)
-            mp->p->seeds.clear();
-        else
-            //Set seed point to trigger path tree compute
-            mp->p->seeds.push_back(Point(x, y));
+        //Set seed point to trigger path tree compute
+        mp->p->seeds.push_back(Point(x, y));
         mp->click = true;
     }
     else if(event == EVENT_MBUTTONUP)
@@ -232,9 +232,16 @@ int main()
     {
         if(mp.click)
         {
+            //Clicking means confirming the cursor position as seed point, therefore add the entire seed-to-cursor path to trail
             reverse(p.mouse.begin(), p.mouse.end());
             p.trail.push_back(p.mouse);
-            link = wire(p.seeds.back(), c);
+            if(p.seeds.size() > 1 && abs(p.mouse.back().x - p.seeds[0].x) + abs(p.mouse.back().y - p.seeds[0].y) < 10)
+            {
+                p.trail.back().push_back(p.seeds[0]);
+                p.seeds.clear();
+            }
+            else
+                link = wire(p.seeds.back(), c);
             mp.click = false;
         }
 
@@ -247,6 +254,7 @@ int main()
             break;
         else if(key == 8)
         {
+            //Back space pops the last seed point and re-draws the lasso
             if(p.seeds.size() > 0)
             {
                 p.seeds.pop_back();
@@ -256,6 +264,7 @@ int main()
         }
         else if(key == 's')
         {
+            //Print out all the contour pixels, can be used for file print 
             for(int i = 0; i < p.trail.size(); i++)
                 for(int j = 0; j < p.trail[i].size(); j++)
                     cout << p.trail[i][j] << " ";
