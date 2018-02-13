@@ -182,7 +182,7 @@ void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
             line(canvas, curr, prev, Scalar(0, 0, 255), 2);
             curr = prev;
         }
-        
+
         //Put emphasis on seed points by drawing green dots
         for(int i = 0; i < p.seeds.size(); i++)
             circle(canvas, p.seeds[i], 3, Scalar(0, 255, 0), -1);
@@ -211,7 +211,7 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata)
         mp->p->cursor = Point(x, y);
 }
 
-int main()
+int main(int argc, char** argv)
 {
     Path p;
     MouseParam mp = {&p, false};
@@ -220,8 +220,8 @@ int main()
     moveWindow("Image", 1000, 0);
     setMouseCallback("Image", mouseCallback, (void*)&mp);
 
-    Mat canvas, image = imread("curless.png", CV_LOAD_IMAGE_COLOR);
-    resize(image, image, Size(), 0.5, 0.5);
+    Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
+    resize(image, image, Size(), argc < 3? 0.5: atoi(argv[2]), argc < 3? 0.5: atoi(argv[2]));
     Matrixf c = cost(image);
 
     Mat vis = visualize(image, c);
@@ -270,7 +270,26 @@ int main()
                     cout << p.trail[i][j] << " ";
             cout << endl;
         }
-        
+        else if(key == 'c')
+        {
+            Mat cropped, mask = Mat::zeros(image.size(), CV_8UC3);
+
+            //Set up contours
+            vector<vector<Point> > contours(1);
+            for(int i = 0; i < p.trail.size(); i++)
+                contours[0].insert(contours[0].end(), p.trail[i].begin(), p.trail[i].end());
+            drawContours(mask, contours, -1, Scalar(255, 255, 255), -1);
+
+            Rect bound = boundingRect(contours[0]);
+
+            //Mask original image by contour and crop by bounding rect
+            image.copyTo(cropped, mask);
+            cropped = cropped(bound);
+
+            imshow("Cropped", cropped);
+            waitKey(0);
+            destroyWindow("Cropped");
+        }
     }
 
     return 0;
