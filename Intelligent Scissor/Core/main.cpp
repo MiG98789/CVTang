@@ -3,6 +3,16 @@
 using namespace cv;
 using namespace std;
 
+Mat blur(const Mat& original, int degree)
+{
+    if(degree % 2)
+    {
+        Mat image;
+        GaussianBlur(original, image, Size(degree, degree), 0);
+        return image;
+    }
+}
+
 Matrixf cost(const Mat& original)
 {
     int h = original.rows;
@@ -222,6 +232,7 @@ int main(int argc, char** argv)
 
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
     resize(image, image, Size(), argc < 3? 0.5: atoi(argv[2]), argc < 3? 0.5: atoi(argv[2]));
+    image = blur(image, 15);
     Matrixf c = cost(image);
 
     Mat vis = visualize(image, c);
