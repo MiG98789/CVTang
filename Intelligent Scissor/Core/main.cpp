@@ -13,6 +13,19 @@ Mat blur(const Mat& original, int degree)
     }
 }
 
+Point snap(const Mat& original, const Point& cursor)
+{
+    Mat image;
+    cvtColor(original, image, CV_RGB2GRAY);
+    image = blur(image, 3);
+    Canny(image, image, 40, 180);
+    Mat img;
+    original.copyTo(img, image);
+    cvtColor(img, img, CV_RGB2GRAY);
+    imshow("", img);
+    waitKey(0);
+}
+
 Matrixf cost(const Mat& original)
 {
     int h = original.rows;
@@ -232,12 +245,15 @@ int main(int argc, char** argv)
 
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
     resize(image, image, Size(), argc < 3? 0.5: atoi(argv[2]), argc < 3? 0.5: atoi(argv[2]));
+
+    snap(image, Point(0, 0));
     image = blur(image, 15);
     Matrixf c = cost(image);
 
     Mat vis = visualize(image, c);
 
     Matrix<Point> link(image.rows, image.cols);
+
 
     while(1)
     {
