@@ -46,6 +46,7 @@ Point snap(const Mat& original, const Point& cursor)
     cvtColor(original, image, CV_RGB2GRAY);
     image = blur(image, 5);
     Canny(image, image, 40, 180);
+    rectangle(image, Point(0, 0), Point(image.cols-1, image.rows-1), Scalar(255));
 
     return spiral(image, cursor);
 }
@@ -216,7 +217,7 @@ vector<Point> trace(Point seed, Point cursor, const Matrix<Point>& link)
     return route;
 }
 
-void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
+void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link, bool snapping = false)
 {
     p.lock = true;
     canvas = image.clone();
@@ -228,7 +229,10 @@ void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
 
     if(p.seeds.size() > 0)
     {
-        p.mouse = trace(p.seeds.back(), p.cursor, link);
+        if(snapping)
+            p.mouse = trace(p.seeds.back(), snap(image, p.cursor), link);
+        else
+            p.mouse = trace(p.seeds.back(), p.cursor, link);
         for(int i = 0; i < (int)p.mouse.size() - 1; i++)
             line(canvas, p.mouse[i], p.mouse[i+1], Scalar(0, 0, 255), 2);
 
@@ -277,7 +281,9 @@ int main(int argc, char** argv)
     cvtColor(image, show, CV_RGB2GRAY);
     show = blur(show, 5);
     Canny(show, show, 40, 180);
-    imshow("", show);
+    rectangle(show, Point(0, 0), Point(show.cols-1, show.rows-1), Scalar(255));
+
+    imshow("Edge reference", show);
 
     //image = blur(image, 15);
     Matrixf c = cost(image);
@@ -314,7 +320,7 @@ int main(int argc, char** argv)
         }
 
         //Continous drawing of lasso lines
-        draw(canvas, image, p, link);
+        draw(canvas, image, p, link, snapping);
 
         imshow("Image", canvas);
         char key = (char)waitKey(1);
