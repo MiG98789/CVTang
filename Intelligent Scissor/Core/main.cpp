@@ -13,17 +13,41 @@ Mat blur(const Mat& original, int degree)
     }
 }
 
+Point spiral(const Mat& image, const Point cursor)
+{
+    int h = image.rows, w = image.cols;
+    int X = w, Y = h;
+    int x = 0, y = 0, dx = 0, dy = -1;
+    int t = max(X, Y), maxi = t * t;
+
+    for(int i = 0; i < maxi; i++)
+    {
+        if((-X/2 < x) && (x <= X/2) && (-Y/2 < y) && (y <= Y/2))
+        {
+            int cx = cursor.x + x, cy = cursor.y + y;
+            if(cx >= 0 && cx < w && cy >= 0 && cy < h)
+                if(image.at<uchar>(cy, cx) == 255)
+                    return Point(cx, cy);
+        }
+        if((x == y) || (x < 0 && x == -y) || (x > 0 && x == 1-y))
+        {
+            t = dx;
+            dx = -dy;
+            dy = t;
+        }
+        x += dx;
+        y += dy;
+    }
+}
+
 Point snap(const Mat& original, const Point& cursor)
 {
     Mat image;
     cvtColor(original, image, CV_RGB2GRAY);
-    image = blur(image, 3);
+    image = blur(image, 5);
     Canny(image, image, 40, 180);
-    Mat img;
-    original.copyTo(img, image);
-    cvtColor(img, img, CV_RGB2GRAY);
-    imshow("", img);
-    waitKey(0);
+
+    return spiral(image, cursor);
 }
 
 Matrixf cost(const Mat& original)
@@ -181,6 +205,17 @@ Matrix<Point> wire(const Point& seed, const Matrixf& cost)
     return path;
 }
 
+vector<Point> trace(Point seed, Point cursor, const Matrix<Point>& link)
+{
+    vector<Point> route;
+    while(cursor != seed)
+    {
+        route.push_back(cursor);
+        cursor = link.get(cursor.y, cursor.x);
+    }
+    return route;
+}
+
 void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
 {
     p.lock = true;
@@ -193,18 +228,9 @@ void draw(Mat& canvas, const Mat& image, Path& p, const Matrix<Point>& link)
 
     if(p.seeds.size() > 0)
     {
-        Point seed = p.seeds.back();
-        Point curr = p.cursor;
-        //re-initialize last-seed-point to cursor trail
-        p.mouse.clear();
-        while(curr != seed)
-        {
-            p.mouse.push_back(curr);
-            //path(i, j) is the next pixel position to link to from Point(j, i) ps. Point uses (x, y) so has to flip ij
-            Point prev = link.get(curr.y, curr.x);
-            line(canvas, curr, prev, Scalar(0, 0, 255), 2);
-            curr = prev;
-        }
+        p.mouse = trace(p.seeds.back(), p.cursor, link);
+        for(int i = 0; i < (int)p.mouse.size() - 1; i++)
+            line(canvas, p.mouse[i], p.mouse[i+1], Scalar(0, 0, 255), 2);
 
         //Put emphasis on seed points by drawing green dots
         for(int i = 0; i < p.seeds.size(); i++)
@@ -238,6 +264,7 @@ int main(int argc, char** argv)
 {
     Path p;
     MouseParam mp = {&p, false};
+    bool snapping = false;
 
     namedWindow("Image", WINDOW_AUTOSIZE);
     moveWindow("Image", 1000, 0);
@@ -246,22 +273,36 @@ int main(int argc, char** argv)
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
     resize(image, image, Size(), argc < 3? 0.5: atoi(argv[2]), argc < 3? 0.5: atoi(argv[2]));
 
-    snap(image, Point(0, 0));
-    image = blur(image, 15);
+    Mat show;
+    cvtColor(image, show, CV_RGB2GRAY);
+    show = blur(show, 5);
+    Canny(show, show, 40, 180);
+    imshow("", show);
+
+    //image = blur(image, 15);
     Matrixf c = cost(image);
 
     Mat vis = visualize(image, c);
 
     Matrix<Point> link(image.rows, image.cols);
 
-
     while(1)
     {
         if(mp.click)
         {
+            if(snapping)
+            {
+                p.seeds.back() = snap(image, p.seeds.back());
+
+                if(p.seeds.size() > 1)
+                    p.mouse = trace(p.seeds.end()[-2], p.seeds.back(), link);
+            }
             //Clicking means confirming the cursor position as seed point, therefore add the entire seed-to-cursor path to trail
-            reverse(p.mouse.begin(), p.mouse.end());
-            p.trail.push_back(p.mouse);
+            if(p.mouse.size() > 0)
+            {
+                reverse(p.mouse.begin(), p.mouse.end());
+                p.trail.push_back(p.mouse);
+            }
             if(p.seeds.size() > 1 && abs(p.mouse.back().x - p.seeds[0].x) + abs(p.mouse.back().y - p.seeds[0].y) < 10)
             {
                 p.trail.back().push_back(p.seeds[0]);
@@ -316,6 +357,11 @@ int main(int argc, char** argv)
             imshow("Cropped", cropped);
             waitKey(0);
             destroyWindow("Cropped");
+        }
+        else if(key == 'e')
+        {
+            snapping = !snapping;
+            cout << "Snap " << (snapping? "on": "off") << endl;
         }
     }
 
