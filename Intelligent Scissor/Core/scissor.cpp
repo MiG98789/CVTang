@@ -4,7 +4,8 @@
 Scissor::Scissor(const Mat& image): snap(false), cost(image.rows, image.cols, 8), link(image.rows, image.cols)
 {
     original = image.clone();
-    cvtColor(original, edge, CV_RGB2GRAY);
+    finalize = image.clone();
+    cvtColor(finalize, edge, CV_RGB2GRAY);
     edge = Blur(edge, 5);
     Canny(edge, edge, 40, 180);
     rectangle(edge, Point(0, 0), Point(edge.cols-1, edge.rows-1), Scalar(255));
@@ -41,12 +42,28 @@ int Scissor::NeighborCost(Point q, Point r)
     return cost.get(q.y, q.x, mapping[y][x]);
 }
 
-Mat Scissor::Blur(const Mat& original, int degree)
+Mat Scissor::Blur(const Mat& input, int degree)
 {
     Mat image;
     if(degree%2)
-        GaussianBlur(original, image, Size(degree, degree), 0);
+        GaussianBlur(input, image, Size(degree, degree), 0);
     return image;
+}
+
+void Scissor::SetBlur(int degree)
+{
+    path.seeds.clear();
+    path.trail.clear();
+    path.mouse.clear();
+
+    finalize = degree? Blur(original, degree): original.clone();
+    cvtColor(finalize, edge, CV_RGB2GRAY);
+    edge = Blur(edge, 5);
+    Canny(edge, edge, 40, 180);
+    rectangle(edge, Point(0, 0), Point(edge.cols-1, edge.rows-1), Scalar(255));
+
+    Cost();
+    Visualize();
 }
 
 bool Scissor::Visualize()
@@ -54,15 +71,15 @@ bool Scissor::Visualize()
     if(cost.empty())
         return false;
 
-    int h = original.rows;
-    int w = original.cols;
+    int h = finalize.rows;
+    int w = finalize.cols;
     visual = Mat::zeros(Size(3 * w, 3 * h), CV_8UC3);
 
     for(int i = 0; i < h; i++)
         for(int j = 0; j < w; j++) 
         {
             //Image pixel in the middle, surrounded by cost values
-            visual.at<Vec3b>(3*i+1, 3*j+1) = original.at<Vec3b>(i, j);
+            visual.at<Vec3b>(3*i+1, 3*j+1) = finalize.at<Vec3b>(i, j);
             visual.at<Vec3b>(3*i+1, 3*j+2) = Vec3b(cost.get(i, j, 0), cost.get(i, j, 0), cost.get(i, j, 0));
             visual.at<Vec3b>(3*i  , 3*j+2) = Vec3b(cost.get(i, j, 1), cost.get(i, j, 1), cost.get(i, j, 1));
             visual.at<Vec3b>(3*i  , 3*j+1) = Vec3b(cost.get(i, j, 2), cost.get(i, j, 2), cost.get(i, j, 2));
@@ -105,10 +122,10 @@ Point Scissor::Snap(Point cursor)
 
 void Scissor::Cost()
 {
-    int h = original.rows;
-    int w = original.cols;
-    int c = original.channels();
-    Matrixf img(original);
+    int h = finalize.rows;
+    int w = finalize.cols;
+    int c = finalize.channels();
+    Matrixf img(finalize);
     Matrixf d_color(4, c);
     float maxD = -1.0f;
 
@@ -233,7 +250,7 @@ void Scissor::Trace(Point seed, Point cursor)
 void Scissor::Draw(Mat& canvas)
 {
     path.lock = true;
-    canvas = original.clone();
+    canvas = finalize.clone();
 
     //draw lines for all previously recorded seed point to seed point trails
     for(int i = 0; i < path.trail.size(); i++)
@@ -307,7 +324,7 @@ void Scissor::ToggleSnap()
 
 Mat Scissor::Crop()
 {
-    Mat cropped, mask = Mat::zeros(original.size(), CV_8UC3);
+    Mat cropped, mask = Mat::zeros(finalize.size(), CV_8UC3);
 
     //Set up contours
     vector<vector<Point> > contours(1);
@@ -318,7 +335,7 @@ Mat Scissor::Crop()
     Rect bound = boundingRect(contours[0]);
 
     //Mask original image by contour and crop by bounding rect
-    original.copyTo(cropped, mask);
+    finalize.copyTo(cropped, mask);
     cropped = cropped(bound);
 
     return cropped;
@@ -341,6 +358,3 @@ void Scissor::MouseCallback(int event, int x, int y)
         path.cursor = snap? Snap(Point(x, y)): Point(x, y);
 }
 
-void Scissor::ButtonCallback(int state)
-{
-}

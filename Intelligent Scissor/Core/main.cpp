@@ -22,13 +22,21 @@ int main(int argc, char** argv)
     moveWindow("Canvas", 1000, 0);
     setMouseCallback("Canvas", mouseCallback, (void*)&cp);
 
-    bool snap = false;
+    int prev = 0, degree = 0;
+    createTrackbar("Blur", "Canvas", &degree, 9);
+
     while(true)
     {
         if(cp.click)
         {
             scissor.OnClick();
             cp.click = false;
+        }
+
+        if(degree != prev)
+        {
+            scissor.SetBlur(degree * 2 + 1);
+            prev = degree;
         }
 
         scissor.Draw(canvas);

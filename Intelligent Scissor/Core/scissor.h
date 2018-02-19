@@ -16,8 +16,8 @@ class Scissor
         Matrix<Point>   link;
 
         Mat original;
+        Mat finalize;
         Mat visual;
-        Mat render;
         Mat canvas;
         Mat edge;
 
@@ -35,19 +35,19 @@ class Scissor
         void OnClick();
         void PopSeed();
         void ToggleSnap();
+        void SetBlur(int degree);
         void SaveContour(const char* filename);
 
         Mat Blur(const Mat& original, int degree);
-        bool Visualize();
 
         void Cost();
+        bool Visualize();
         bool Wire(const Point& seed);
         void Trace(Point seed, Point cursor);
 
         void Draw(Mat& canvas);
 
         void MouseCallback(int event, int x, int y);
-        void ButtonCallback(int state);
 };
 
 struct CallbackParam
