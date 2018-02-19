@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <typeinfo>
 #include <cstdlib>
 #include <vector>
@@ -22,6 +23,8 @@ class Matrix
     public:
         int h, w, c;
         vector<T> data;
+
+        Matrix(const Matrix<T>& copy): h(copy.h), w(copy.w), c(copy.c), data(copy.data){}
 
         Matrix(int h, int w, int c = 1): h(h), w(w), c(c), data(h * w * c) {}
 
@@ -65,6 +68,9 @@ class Matrixf
                 out[l] = data[i * w * c + j * c + l];
             return out;
         }
+
+        bool empty() const
+        { return data.empty(); }
 
         bool inbound(int x, int y, int z = 0) const
         { return !(x < 0 || y < 0 || z < 0 || x >=h || y >= w || z >= c); }
@@ -132,9 +138,4 @@ struct Path
     bool lock = false;
 };
 
-struct MouseParam
-{
-    Path* p;
-    bool click;
-};
 #endif
