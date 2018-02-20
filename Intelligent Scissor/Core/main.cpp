@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     setMouseCallback("Canvas", mouseCallback, (void*)&cp);
 
     int prev = 0, degree = 0;
-    createTrackbar("Blur", "Canvas", &degree, 9);
+    createTrackbar("Blur", "Canvas", &degree, 21);
 
     while(true)
     {
