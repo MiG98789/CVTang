@@ -18,6 +18,11 @@
 		h2 {
 			font-weight: bold;
 		}
+
+		.baw {
+			font-weight: bold;
+			font-style: italic;
+		}
 	</style>
 </head>
 
@@ -56,13 +61,23 @@
 	<div class="container-fluid bg-3 text-center">
 		<div class="row">
 			<h2 id="project-1">Project 1: Intelligent Scissor</h2>
+			<a href="Intelligent Scissor/README.html">README</a>
 
 			<div class="container-fluid bg-3 text-left">
+				<h3>How It Works</h3>
+				<p>Once the program starts running, an image is loaded onto the GUI. There, the user can choose to blur the image with a
+					Gaussian blur, where the kernel size can be adjusted with the provided slider. By clicking anywhere on the image, the
+					first seed's position is selected. Any consecutive clicks afterwards will choose the next seeds' locations, where the
+					next seed is linked to the previous seed by calculating the cost graph, then a wire is drawn between the two seeds by
+					following the minimum cost path. Finally, the user may extract the desired subimage by cropping according to the contour.</p>
+
+				<br>
+
 				<h3>Hotkey Guide</h3>
 				<table class="table table-bordered table-hover">
 					<thead>
 						<tr>
-							<th>Hotkey</th>
+							<th class="col-md-3">Hotkey</th>
 							<th>Description</th>
 						</tr>
 					</thead>
@@ -105,9 +120,9 @@
 						</tr>
 					</tbody>
 				</table>
-			</div>
 
-			<div class="container-fluid bg-3 text-left">
+				<br>
+
 				<h3>Extra Features</h3>
 				<table class="table table-bordered table-hover">
 					<thead>
@@ -118,8 +133,9 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td>Modify the interface and program to allow blurring the image by different amounts before computing link costs. Describe
-								your observations on how this changes the results.</td>
+							<td>
+								<span class="baw">[Listed]</span> Modify the interface and program to allow blurring the image by different amounts before computing
+								link costs. Describe your observations on how this changes the results.</td>
 							<td>The image can be smoothed with a Gaussian blur, where the kernel size can be adjusted from 0 to 9 using the slider
 								bar present on the GUI. Below are the results of using kernels of size 0, 5, 9, and 21.
 
@@ -197,15 +213,9 @@
 						</tr>
 
 						<tr>
-							<td>Try different costs functions, for example the method described in Intelligent Scissors for Image Composition, and
-								modify the user interface to allow the user to select different functions. Describe your observations on how this
-								changes the results.</td>
-							<td>WIP</td>
-						</tr>
-
-						<tr>
-							<td>The only point that doesn't snap to edges is the seed. Implement a seed snapping feature, where the seed is automatically
-								moved to the closest edge.</td>
+							<td>
+								<span class="baw">[Listed]</span> The only point that doesn't snap to edges is the seed. Implement a seed snapping feature, where the
+								seed is automatically moved to the closest edge.</td>
 							<td>To toggle the seed snapping feature, the user simply presses the &lt;v&gt; hotkey, which turns the seed red instead
 								of the usual green. As the user drags the cursor around the image, the seed will automatically snap to the closest
 								edge.
@@ -215,6 +225,46 @@
 								the nearest edge from the current cursor position is found by a simple outward spiral search. From the current cursor
 								position, check the neighbouring pixels for any edge in a clockwise direction repeatedly until an edge is found,
 								during which the seed's coordinates is set as the found edge's coordinates.
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								<span class="baw">[Unlisted]</span> After drawing the wire on the image, users can choose to crop the image at any time, which will
+								be opened in a separate window.</td>
+							<td>
+								After the user has selected at least one seed, pressing &lt;c&gt; will open a window with the area enclosed by all the seeds
+								and links. For an open contour, the two open ends will be joined together to form the cropped image as shown below.
+
+								<br>
+								<br>
+
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th class="col-md-6">Image with open contour</th>
+											<th>Output</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>
+												<img src="resources/proj1/crop_opencontour_input.png">
+											</td>
+											<td>
+												<img src="resources/proj1/crop_opencontour_res.png">
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								<span class="baw">[Unlisted]</span> A help window is opened to show users what each hotkey does.</td>
+							<td>
+								If a user presses &lt;h&gt;, a help window will be opened.
 							</td>
 						</tr>
 					</tbody>
@@ -236,7 +286,6 @@
 		<div class="row">
 			<h2 id="project-4">Project 4: Multiple-view Modeling</h2>
 		</div>
-	</div>
 	</div>
 </body>
 
