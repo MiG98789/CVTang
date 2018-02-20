@@ -10,6 +10,13 @@ void mouseCallback(int event, int x, int y, int flags, void* data)
     cp->scissor->MouseCallback(event, x, y);
 }
 
+void text(Mat& image, const char texts[9][50])
+{
+    int h = image.rows, w = image.cols;
+    for(int i = 0; i < 9; i++)
+        putText(image, texts[8-i], Point(0, h-1 - i*50-20), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
+}
+
 int main(int argc, char** argv)
 {
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
@@ -55,8 +62,6 @@ int main(int argc, char** argv)
         {
             Mat crop = scissor.Crop();
             imshow("Cropped", crop);
-            waitKey(0);
-            destroyWindow("Cropped");
         }
         else if(key == 'v')
         {
@@ -65,9 +70,23 @@ int main(int argc, char** argv)
 
             imshow("Edge reference", edge);
             imshow("Cost graph", visual);
-            waitKey(0);
-            destroyWindow("Edge reference");
-            destroyWindow("Cost graph");
+        }
+        else if(key == 'h')
+        {
+            char texts[9][50] = {
+                "Left  Mouse  - insert seed",
+                "Mid   Mouse  - reset",
+                "<q>          - quit",
+                "<bkspace>    - remove last seed",
+                "<s>          - save contour to file",
+                "<e>          - toggle edge snapping",
+                "<c>          - crop with contour",
+                "<v>          - visualize edge and cost graph",
+                "<h>          - display this help page"};
+
+            Mat help = Mat::zeros(Size(900, 500), CV_8UC3);
+            text(help, texts);
+            imshow("HELP" , help);
         }
     }
     return 0;

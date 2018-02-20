@@ -299,11 +299,17 @@ void Scissor::OnClick()
 
 void Scissor::PopSeed()
 {
-    if(path.seeds.size() > 0)
+    if(path.seeds.size() > 1)
     {
         path.seeds.pop_back();
         path.trail.pop_back();
         Wire(path.seeds.back());
+    }
+    else if(path.seeds.size() == 1)
+    {
+        path.seeds.clear();
+        path.trail.clear();
+        path.mouse.clear();
     }
 }
 
