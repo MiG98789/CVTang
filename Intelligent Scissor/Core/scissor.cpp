@@ -1,7 +1,7 @@
 #include "define.h"
 #include "scissor.h"
 
-Scissor::Scissor(const Mat& image): snap(false), cost(image.rows, image.cols, 8), link(image.rows, image.cols)
+Scissor::Scissor(const Mat& image): snap(false), hide(false), cost(image.rows, image.cols, 8), link(image.rows, image.cols)
 {
     original = image.clone();
     finalize = image.clone();
@@ -12,6 +12,14 @@ Scissor::Scissor(const Mat& image): snap(false), cost(image.rows, image.cols, 8)
 
     Cost();
     Visualize();
+    Pixelize();
+}
+
+void Scissor::Reset()
+{
+    path.seeds.clear();
+    path.trail.clear();
+    path.mouse.clear();
 }
 
 bool Scissor::GetLock() const
@@ -27,6 +35,11 @@ const Mat& Scissor::GetEdge() const
 const Mat& Scissor::GetVisual() const
 {
     return visual;
+}
+
+const Mat& Scissor::GetPixel() const
+{
+    return pixel;
 }
 
 int Scissor::NeighborCost(Point q, Point r)
@@ -64,6 +77,7 @@ void Scissor::SetBlur(int degree)
 
     Cost();
     Visualize();
+    Pixelize();
 }
 
 bool Scissor::Visualize()
@@ -90,6 +104,45 @@ bool Scissor::Visualize()
             visual.at<Vec3b>(3*i+2, 3*j+2) = Vec3b(cost.get(i, j, 7), cost.get(i, j, 7), cost.get(i, j, 7));
         }
     return true;
+}
+
+void Scissor::Pixelize()
+{
+    if(cost.empty())
+        return;
+
+    int h = finalize.rows;
+    int w = finalize.cols;
+    pixel = Mat::zeros(Size(3 * w, 3 * h), CV_8UC3);
+
+    for(int i = 0; i < h; i++)
+        for(int j = 0; j < w; j++) 
+            //Image pixel in the middle, surrounded by cost values
+            pixel.at<Vec3b>(3*i+1, 3*j+1) = finalize.at<Vec3b>(i, j);
+}
+
+void Scissor::PathTree(Mat& tree, int nodes)
+{
+    int h = finalize.rows;
+    int w = finalize.cols;
+    tree = Mat::zeros(Size(3 * w, 3 * h), CV_8UC3);
+
+    for(int i = 0; i < h; i++)
+        for(int j = 0; j < w; j++)
+            tree.at<Vec3b>(3*i+1, 3*j+1) = finalize.at<Vec3b>(i, j);
+
+    for(int i = 0; i < nodes && i < explore.size(); i++)
+    {
+        vector<Point> route = Trace(path.seeds.back(), explore[i]);
+        int size = route.size();
+        for(int j = 0; j < size - 1; j++)
+        {
+            Point p = route[size - j - 2], p1 = route[size - j - 1];
+            int ox = p1.x - p.x;
+            int oy = p1.y - p.y;
+            tree.at<Vec3b>(3*p.y+1+oy, 3*p.x+1+ox) = Vec3b(0, min(j*2, 255), min(j*2, 255));
+        }
+    }
 }
 
 Point Scissor::Snap(Point cursor)
@@ -179,6 +232,8 @@ bool Scissor::Wire(const Point& seed)
     float buf[8];
     FibHeap pq;
 
+    explore.clear();
+
     //Construct Node structure for shortest path tree calc
     vector<Pnode *> nodes;
     for(int i = 0; i < h; i++)
@@ -211,6 +266,8 @@ bool Scissor::Wire(const Point& seed)
                             r->totalCost = q->totalCost + NeighborCost(q->pt, r->pt);
                             r->state = ACTIVE;
                             pq.Insert(r);
+
+                            explore.push_back(r->pt);
                         }
                         //if r is already in queue
                         else if(r->state == ACTIVE)
@@ -237,39 +294,44 @@ bool Scissor::Wire(const Point& seed)
     return true;
 }
 
-void Scissor::Trace(Point seed, Point cursor)
+vector<Point> Scissor::Trace(Point seed, Point cursor)
 {
-    path.mouse = vector<Point>();
+    vector<Point> route;
     while(cursor != seed)
     {
-        path.mouse.push_back(cursor);
+        route.push_back(cursor);
         cursor = link.get(cursor.y, cursor.x);
     }
+    return route;
 }
 
-void Scissor::Draw(Mat& canvas)
+void Scissor::Draw(Mat& draw_canvas)
 {
     path.lock = true;
     canvas = finalize.clone();
 
-    //draw lines for all previously recorded seed point to seed point trails
-    for(int i = 0; i < path.trail.size(); i++)
-        for(int j = 0; j < (int)path.trail[i].size() - 1; j++)
-            line(canvas, path.trail[i][j], path.trail[i][j+1], Scalar(0, 0, 255), 2);
-
-    if(path.seeds.size() > 0)
+    if(!hide)
     {
-        Trace(path.seeds.back(), path.cursor);
-        for(int i = 0; i < (int)path.mouse.size() - 1; i++)
-            line(canvas, path.mouse[i], path.mouse[i+1], Scalar(0, 0, 255), 2);
+        //draw lines for all previously recorded seed point to seed point trails
+        for(int i = 0; i < path.trail.size(); i++)
+            for(int j = 0; j < (int)path.trail[i].size() - 1; j++)
+                line(canvas, path.trail[i][j], path.trail[i][j+1], Scalar(0, 0, 255), 2);
 
-        //pathut empathhasis on seed pathoints by drawing green dots
-        for(int i = 0; i < path.seeds.size(); i++)
-            circle(canvas, path.seeds[i], 3, Scalar(0, 255, 0), -1);
+        if(path.seeds.size() > 0)
+        {
+            path.mouse = Trace(path.seeds.back(), path.cursor);
+            for(int i = 0; i < (int)path.mouse.size() - 1; i++)
+                line(canvas, path.mouse[i], path.mouse[i+1], Scalar(0, 0, 255), 2);
+
+            //pathut empathhasis on seed pathoints by drawing green dots
+            for(int i = 0; i < path.seeds.size(); i++)
+                circle(canvas, path.seeds[i], 3, Scalar(0, 255, 0), -1);
+        }
+
+        circle(canvas, path.cursor, 3, snap? Scalar(255, 0, 255): Scalar(0, 255, 0), -1);
     }
 
-    circle(canvas, path.cursor, 3, snap? Scalar(255, 0, 255): Scalar(0, 255, 0), -1);
-
+    draw_canvas = canvas.clone();
     path.lock = false;
 }
 
@@ -280,7 +342,7 @@ void Scissor::OnClick()
         path.seeds.back() = Snap(path.seeds.back());
 
         if(path.seeds.size() > 1)
-            Trace(path.seeds.end()[-2], path.seeds.back());
+            path.mouse = Trace(path.seeds.end()[-2], path.seeds.back());
     }
     //Clicking means confirming the cursor position as seed point, therefore add the entire seed-to-cursor path to trail
     if(path.mouse.size() > 0)
@@ -313,13 +375,32 @@ void Scissor::PopSeed()
     }
 }
 
+void Scissor::CloseContour()
+{
+    path.mouse = Trace(path.seeds.back(), path.seeds[0]);
+    path.trail.back().insert(path.trail.back().end(), path.mouse.rbegin(), path.mouse.rend());
+    path.seeds.clear();
+}
+
 void Scissor::SaveContour(const char* filename)
 {
+    while(GetLock());
+    imwrite(filename, canvas);
+}
+
+void Scissor::SaveMask(const char* filename)
+{
+    imwrite(filename, mask);
+}
+
+void Scissor::SaveLasso(const char* filename)
+{
+    if(path.trail.size() == 0)
+        return;
     ofstream out(filename);
     for(int i = 0; i < path.trail.size(); i++)
         out << path.trail[i] << " ";
     out << endl;
-    cout << "Contour saved to " << filename << endl;
 }
 
 void Scissor::ToggleSnap()
@@ -328,9 +409,16 @@ void Scissor::ToggleSnap()
     cout << "Snap " << (snap? "on": "off") << endl;
 }
 
+void Scissor::ToggleHide()
+{
+    hide = !hide;
+    cout << "Hide " << (hide? "on": "off") << endl;
+}
+
 Mat Scissor::Crop()
 {
-    Mat cropped, mask = Mat::zeros(finalize.size(), CV_8UC3);
+    Mat cropped;
+    mask = Mat::zeros(finalize.size(), CV_8UC3);
 
     //Set up contours
     vector<vector<Point> > contours(1);

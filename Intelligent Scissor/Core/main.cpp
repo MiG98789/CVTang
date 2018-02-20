@@ -17,6 +17,93 @@ void text(Mat& image, const char texts[9][50])
         putText(image, texts[8-i], Point(0, h-1 - i*50-20), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
 }
 
+void onSaveContour(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->SaveContour("contour.jpg");
+    cout << "Contour saved to contour.jpg" << endl;
+}
+
+void onSaveMask(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->SaveMask("mask.jpg");
+    cout << "Mask saved to mask.jpg" << endl;
+}
+
+void onSaveLasso(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->SaveLasso("lasso.txt");
+    cout << "Lasso saved to lasso.txt" << endl;
+}
+
+void onCrop(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    Mat crop = cp->scissor->Crop();
+    imshow("Cropped", crop);
+}
+
+void onPopSeed(int state, void* data)
+{
+    CallbackParam* cp= (CallbackParam*)data;
+    cp->scissor->PopSeed();
+}
+
+void onCostGraph(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    Mat visual = cp->scissor->GetVisual();
+    imshow("Cost graph", visual);
+}
+
+void onEdgeGraph(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    Mat edge = cp->scissor->GetEdge();
+    imshow("Edge reference", edge);
+}
+
+void onPixel(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    Mat pixel = cp->scissor->GetPixel();
+    imshow("Pixel graph", pixel);
+}
+
+void onPathTree(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    Mat tree;
+    cp->scissor->PathTree(tree, cp->nodes);
+    imshow("Path tree", tree);
+}
+
+void onSnap(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->ToggleSnap();
+}
+
+void onHide(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->ToggleHide();
+}
+
+void onReset(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->Reset();
+}
+
+void onCloseContour(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->CloseContour();
+}
+
 int main(int argc, char** argv)
 {
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
@@ -25,12 +112,28 @@ int main(int argc, char** argv)
     Scissor scissor(image);
     CallbackParam cp = {&scissor, false};
 
+    int prev = 0, degree = 0, dummy = 0;
     namedWindow("Canvas", WINDOW_AUTOSIZE);
     moveWindow("Canvas", 1000, 0);
     setMouseCallback("Canvas", mouseCallback, (void*)&cp);
+    cvCreateTrackbar("Blur", "Canvas", &degree, 9, NULL);
 
-    int prev = 0, degree = 0;
-    createTrackbar("Blur", "Canvas", &degree, 9);
+    createButton("Save Contour", onSaveContour, (void*)&cp);
+    createButton("Save Mask", onSaveMask, (void*)&cp);
+    createButton("Save Lasso", onSaveLasso, (void*)&cp);
+    createButton("Crop", onCrop, (void*)&cp);
+    cvCreateTrackbar("Nodes", NULL, &cp.nodes, 50000, NULL);
+    createButton("Cost Graph", onCostGraph, (void*)&cp);
+    createButton("Edge Graph", onEdgeGraph, (void*)&cp);
+    createButton("Pixel Graph", onPixel, (void*)&cp);
+    createButton("Path Tree", onPathTree, (void*)&cp);
+    cvCreateTrackbar("  ", NULL, &dummy, 1, NULL);
+    createButton("Pop Seed", onPopSeed, (void*)&cp);
+    createButton("Snapping", onSnap, (void*)&cp);
+    createButton("Contour", onHide, (void*)&cp);
+    createButton("Close Contour", onCloseContour, (void*)&cp);
+    cvCreateTrackbar("    ", NULL, &dummy, 1, NULL);
+    createButton("Reset", onReset, (void*)&cp);
 
     while(true)
     {
@@ -91,3 +194,4 @@ int main(int argc, char** argv)
     }
     return 0;
 }
+
