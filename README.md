@@ -1,1 +1,1 @@
-[mig98789.github.io/CVTang](Documentation)
+[Documentation](mig98789.github.io/CVTang)
