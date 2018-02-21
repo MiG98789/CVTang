@@ -69,212 +69,270 @@
 			<a class="readme" href="Intelligent Scissor/README.html">README</a>
 
 			<div class="container-fluid bg-3 text-left">
-				<h3>How It Works</h3>
-				<p>Once the program starts running, an image is loaded onto the GUI. There, the user can choose to blur the image with a
-					Gaussian blur, where the kernel size can be adjusted with the provided slider. By clicking anywhere on the image, the
-					first seed's position is selected. Any consecutive clicks afterwards will choose the next seeds' locations, where the
-					next seed is linked to the previous seed by calculating the cost graph, then a wire is drawn between the two seeds by
-					following the minimum cost path. Finally, the user may extract the desired subimage by cropping according to the contour.</p>
-
-				<br>
-
-				<h3>Hotkey Guide</h3>
-				<table class="table table-bordered table-hover">
-					<thead>
-						<tr>
-							<th class="col-md-3">Hotkey</th>
-							<th>Description</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Left Mouse</td>
-							<td>Insert seed</td>
-						</tr>
-						<tr>
-							<td>Middle Mouse</td>
-							<td>Reset</td>
-						</tr>
-						<tr>
-							<td>&lt;q&gt;</td>
-							<td>Quit</td>
-						</tr>
-						<tr>
-							<td>&lt;backspace&gt;</td>
-							<td>Remove last seed</td>
-						</tr>
-						<tr>
-							<td>&lt;s&gt;</td>
-							<td>Save contour to file</td>
-						</tr>
-						<tr>
-							<td>&lt;e&gt;</td>
-							<td>Toggle edge snapping</td>
-						</tr>
-						<tr>
-							<td>&lt;c&gt;</td>
-							<td>Crop with contour</td>
-						</tr>
-						<tr>
-							<td>&lt;v&gt;</td>
-							<td>Visualize edge and cost graph</td>
-						</tr>
-						<tr>
-							<td>&lt;h&gt;</td>
-							<td>Display the help page</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<br>
-
-				<h3>Extra Features</h3>
-				<table class="table table-bordered table-hover">
-					<thead>
-						<tr>
-							<th class="col-md-3">Bells and Whistles</th>
-							<th>Description</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>
-								<span class="baw">[Listed]</span> Modify the interface and program to allow blurring the image by different amounts before computing
-								link costs. Describe your observations on how this changes the results.</td>
-							<td>The image can be smoothed with a Gaussian blur, where the kernel size can be adjusted from 0 to 9 using the slider
-								bar present on the GUI. Below are the results of using kernels of size 0, 5, 9, and 21.
-
-								<br>
-								<br>
-								<table class="table table-bordered table-hover">
-									<thead>
-										<tr>
-											<th>Kernel size</th>
-											<th>Raw image</th>
-											<th>Image with contour</th>
-											<th>Cropped image</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td>0</td>
-											<td>
-												<img src="resources/proj1/results/blur_k0_raw.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k0_contour.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k0_crop.png">
-											</td>
-										</tr>
-
-										<tr>
-											<td>5</td>
-											<td>
-												<img src="resources/proj1/results/blur_k5_raw.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k5_contour.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k5_crop.png">
-											</td>
-										</tr>
-
-										<tr>
-											<td>9</td>
-											<td>
-												<img src="resources/proj1/results/blur_k9_raw.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k9_contour.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k9_crop.png">
-											</td>
-										</tr>
-
-										<tr>
-											<td>21</td>
-											<td>
-												<img src="resources/proj1/results/blur_k21_raw.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k21_contour.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/blur_k21_crop.png">
-											</td>
-										</tr>
-									</tbody>
-								</table>
-
-								<br>
-								<br> One observation is that using larger kernels to blur the image results in smoother crops. As in, the edges are less
-								spikey, and there is less aliasing along the edges. This would be due to edges being smoothed more when larger kernels
-								are applied to blur the image.
-							</td>
-						</tr>
-
-						<tr>
-							<td>
-								<span class="baw">[Listed]</span> The only point that doesn't snap to edges is the seed. Implement a seed snapping feature, where the
-								seed is automatically moved to the closest edge.</td>
-							<td>To toggle the seed snapping feature, the user simply presses the &lt;v&gt; hotkey, which turns the seed red instead
-								of the usual green. As the user drags the cursor around the image, the seed will automatically snap to the closest
-								edge.
-
-								<br>
-								<br> The seed snapping feature is implemented by first using Canny edge detection to find the edges of the image. Then,
-								the nearest edge from the current cursor position is found by a simple outward spiral search. From the current cursor
-								position, check the neighbouring pixels for any edge in a clockwise direction repeatedly until an edge is found,
-								during which the seed's coordinates is set as the found edge's coordinates.
-							</td>
-						</tr>
-
-						<tr>
-							<td>
-								<span class="baw">[Unlisted]</span> After drawing the wire on the image, users can choose to crop the image at any time, which will
-								be opened in a separate window.</td>
-							<td>
-								After the user has selected at least one seed, pressing &lt;c&gt; will open a window with the area enclosed by all the seeds
-								and links. For an open contour, the two open ends will be joined together to form the cropped image as shown below.
-
-								<br>
-								<br>
-
-								<table class="table table-bordered table-hover">
-									<thead>
-										<tr>
-											<th class="col-md-6">Image with open contour</th>
-											<th>Output</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td>
-												<img src="resources/proj1/results/crop_opencontour_input.png">
-											</td>
-											<td>
-												<img src="resources/proj1/results/crop_opencontour_res.png">
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</td>
-						</tr>
-
-						<tr>
-							<td>
-								<span class="baw">[Unlisted]</span> A help window is opened to show users what each hotkey does.</td>
-							<td>
-								If a user presses &lt;h&gt;, a help window will be opened.
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+					<h3>Artifact</h3>
+					<img src="resources/proj1/artifact/artifact.png">
+			
+					<br>
+			
+					<h3>How It Works</h3>
+					<p>Once the program starts running, an image is loaded onto the GUI. There, the user can choose to blur the image with a Gaussian
+						blur, where the kernel size can be adjusted with the provided slider. By clicking anywhere on the image, the first seed's
+						position is selected. Any consecutive clicks afterwards will choose the next seeds' locations, where the next seed is
+						linked to the previous seed by calculating the cost graph, then a wire is drawn between the two seeds by following the
+						minimum cost path. Finally, the user may extract the desired subimage by cropping according to the contour.</p>
+			
+					<br>
+			
+					<h3>Toolbox</h3>
+					<img src="resources/proj1/results/toolbox.png">
+			
+					<br>
+					<br>
+					<br>
+			
+					<h3>Hotkey Guide</h3>
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th class="col-md-3">Hotkey</th>
+								<th>Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Left Mouse</td>
+								<td>Insert seed</td>
+							</tr>
+							<tr>
+								<td>Middle Mouse</td>
+								<td>Reset</td>
+							</tr>
+							<tr>
+								<td>&lt;ctrl&gt; + &lt;p&gt;</td>
+								<td>Display toolbox</td>
+							</tr>
+							<tr>
+								<td>&lt;q&gt;</td>
+								<td>Quit</td>
+							</tr>
+							<tr>
+								<td>&lt;backspace&gt;</td>
+								<td>Remove last seed</td>
+							</tr>
+							<tr>
+								<td>&lt;s&gt;</td>
+								<td>Save contour to file</td>
+							</tr>
+							<tr>
+								<td>&lt;e&gt;</td>
+								<td>Toggle edge snapping</td>
+							</tr>
+							<tr>
+								<td>&lt;c&gt;</td>
+								<td>Crop with contour</td>
+							</tr>
+							<tr>
+								<td>&lt;i&gt;</td>
+								<td>Inverse crop with contour</td>
+							</tr>
+							<tr>
+								<td>&lt;v&gt;</td>
+								<td>Visualize edge and cost graph</td>
+							</tr>
+							<tr>
+								<td>&lt;h&gt;</td>
+								<td>Display the help page</td>
+							</tr>
+						</tbody>
+					</table>
+			
+					<br>
+			
+					<h3>Extra Features</h3>
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th class="col-md-3">Bells and Whistles</th>
+								<th>Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<span class="baw">[Listed]</span> Modify the interface and program to allow blurring the image by different amounts before computing
+									link costs. Describe your observations on how this changes the results.</td>
+								<td>The image can be smoothed with a Gaussian blur, where the kernel size can be adjusted from 0 to 9 using the slider bar
+									present on the GUI. Below are the results of using kernels of size 0, 5, 9, and 21.
+			
+									<br>
+									<br>
+									<table class="table table-bordered table-hover">
+										<thead>
+											<tr>
+												<th>Kernel size</th>
+												<th>Raw image</th>
+												<th>Image with contour</th>
+												<th>Cropped image</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>0</td>
+												<td>
+													<img src="resources/proj1/results/blur_k0_raw.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k0_contour.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k0_crop.png">
+												</td>
+											</tr>
+			
+											<tr>
+												<td>5</td>
+												<td>
+													<img src="resources/proj1/results/blur_k5_raw.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k5_contour.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k5_crop.png">
+												</td>
+											</tr>
+			
+											<tr>
+												<td>9</td>
+												<td>
+													<img src="resources/proj1/results/blur_k9_raw.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k9_contour.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k9_crop.png">
+												</td>
+											</tr>
+			
+											<tr>
+												<td>21</td>
+												<td>
+													<img src="resources/proj1/results/blur_k21_raw.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k21_contour.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/blur_k21_crop.png">
+												</td>
+											</tr>
+										</tbody>
+									</table>
+			
+									<br>
+									<br> One observation is that using larger kernels to blur the image results in smoother crops. As in, the edges are less
+									spikey, and there is less aliasing along the edges. This would be due to edges being smoothed more when larger kernels
+									are applied to blur the image.
+								</td>
+							</tr>
+			
+							<tr>
+								<td>
+									<span class="baw">[Listed]</span> The only point that doesn't snap to edges is the seed. Implement a seed snapping feature, where the
+									seed is automatically moved to the closest edge.</td>
+								<td>To toggle the seed snapping feature, the user simply presses the &lt;v&gt; hotkey, which turns the seed red instead
+									of the usual green. As the user drags the cursor around the image, the seed will automatically snap to the closest
+									edge.
+			
+									<br>
+									<br> The seed snapping feature is implemented by first using Canny edge detection to find the edges of the image. Then,
+									the nearest edge from the current cursor position is found by a simple outward spiral search. From the current cursor
+									position, check the neighbouring pixels for any edge in a clockwise direction repeatedly until an edge is found, during
+									which the seed's coordinates is set as the found edge's coordinates.
+								</td>
+							</tr>
+			
+							<tr>
+								<td>
+									<span class="baw">[Unlisted]</span> After drawing the lasso on the image, users can choose to crop the image at any time, which will
+									be opened in a separate window.</td>
+								<td>
+									  After the user has selected at least one seed, pressing &lt;c&gt; will open a window with the area enclosed by all the seeds
+									and links. For an open contour, the two open ends will be joined together to form the cropped image as shown below.
+			
+									<br>
+									<br>
+			
+									<table class="table table-bordered table-hover">
+										<thead>
+											<tr>
+												<th class="col-md-6">Image with open contour</th>
+												<th>Output</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													<img src="resources/proj1/results/crop_opencontour_input.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/crop_opencontour_res.png">
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+			
+							<tr>
+								<td>
+									<span class="baw">[Unlisted]</span> Instead of cropping the image to what is enclosed within the contours, crop that region out instead to perform an inverse crop.</td>
+								<td>
+									If a user presses &lt;i&gt;, inverse crop will be performed as shown below.
+			
+									<br>
+									<br>
+			
+									<table class="table table-bordered table-hover">
+										<thead>
+											<tr>
+												<th class="col-md-6">Image with contour</th>
+												<th>Normal Crop</th>
+												<th>Inverse Crop</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													<img src="resources/proj1/results/nicrop_input.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/nicrop_normal.png">
+												</td>
+												<td>
+													<img src="resources/proj1/results/nicrop_inverse.png">
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+			
+							<tr>
+								<td>
+									<span class="baw">[Unlisted]</span> A help window is opened to show users what each hotkey does.</td>
+								<td>
+									If a user presses &lt;h&gt;, a help window will be opened as shown below.
+			
+									<br>
+			
+									<img src="resources/proj1/results/help.png">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			<hr>
 		</div>
 

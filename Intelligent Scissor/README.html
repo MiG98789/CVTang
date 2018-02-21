@@ -32,6 +32,11 @@
 	</div>
 
 	<div class="container-fluid bg-3">
+		<h3>Artifact</h3>
+		<img src="../resources/proj1/artifact/artifact.png">
+
+		<br>
+
 		<h3>How It Works</h3>
 		<p>Once the program starts running, an image is loaded onto the GUI. There, the user can choose to blur the image with a Gaussian
 			blur, where the kernel size can be adjusted with the provided slider. By clicking anywhere on the image, the first seed's
@@ -39,6 +44,13 @@
 			linked to the previous seed by calculating the cost graph, then a wire is drawn between the two seeds by following the
 			minimum cost path. Finally, the user may extract the desired subimage by cropping according to the contour.</p>
 
+		<br>
+
+		<h3>Toolbox</h3>
+		<img src="../resources/proj1/results/toolbox.png">
+
+		<br>
+		<br>
 		<br>
 
 		<h3>Hotkey Guide</h3>
@@ -59,6 +71,10 @@
 					<td>Reset</td>
 				</tr>
 				<tr>
+					<td>&lt;ctrl&gt; + &lt;p&gt;</td>
+					<td>Display toolbox</td>
+				</tr>
+				<tr>
 					<td>&lt;q&gt;</td>
 					<td>Quit</td>
 				</tr>
@@ -77,6 +93,10 @@
 				<tr>
 					<td>&lt;c&gt;</td>
 					<td>Crop with contour</td>
+				</tr>
+				<tr>
+					<td>&lt;i&gt;</td>
+					<td>Inverse crop with contour</td>
 				</tr>
 				<tr>
 					<td>&lt;v&gt;</td>
@@ -230,9 +250,47 @@
 
 				<tr>
 					<td>
+						<span class="baw">[Unlisted]</span> Instead of cropping the image to what is enclosed within the contours, crop that region out instead to perform an inverse crop.</td>
+					<td>
+						If a user presses &lt;i&gt;, inverse crop will be performed as shown below.
+
+						<br>
+						<br>
+
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<th class="col-md-6">Image with contour</th>
+									<th>Normal Crop</th>
+									<th>Inverse Crop</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<img src="../resources/proj1/results/nicrop_input.png">
+									</td>
+									<td>
+										<img src="../resources/proj1/results/nicrop_normal.png">
+									</td>
+									<td>
+										<img src="../resources/proj1/results/nicrop_inverse.png">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
 						<span class="baw">[Unlisted]</span> A help window is opened to show users what each hotkey does.</td>
 					<td>
-						If a user presses &lt;h&gt;, a help window will be opened.
+						If a user presses &lt;h&gt;, a help window will be opened as shown below.
+
+						<br>
+
+						<img src="../resources/proj1/results/help.png">
 					</td>
 				</tr>
 			</tbody>

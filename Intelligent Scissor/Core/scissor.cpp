@@ -415,7 +415,7 @@ void Scissor::ToggleHide()
     cout << "Hide " << (hide? "on": "off") << endl;
 }
 
-Mat Scissor::Crop()
+Mat Scissor::Crop(bool isInverse)
 {
     Mat cropped;
     mask = Mat::zeros(finalize.size(), CV_8UC3);
@@ -424,9 +424,14 @@ Mat Scissor::Crop()
     vector<vector<Point> > contours(1);
     for(int i = 0; i < path.trail.size(); i++)
         contours[0].insert(contours[0].end(), path.trail[i].begin(), path.trail[i].end());
-    drawContours(mask, contours, -1, Scalar(255, 255, 255), -1);
 
+    drawContours(mask, contours, -1, Scalar(255, 255, 255), -1);
     Rect bound = boundingRect(contours[0]);
+
+    if (isInverse)
+    {
+        bitwise_not(mask,mask);   
+    }
 
     //Mask original image by contour and crop by bounding rect
     finalize.copyTo(cropped, mask);

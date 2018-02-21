@@ -37,7 +37,7 @@ class Scissor
         const Mat& GetVisual() const;
         const Mat& GetPixel() const;
 
-        Mat Crop();
+        Mat Crop(bool isInverse);
         void Reset();
         void OnClick();
         void PopSeed();

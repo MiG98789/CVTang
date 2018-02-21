@@ -10,11 +10,11 @@ void mouseCallback(int event, int x, int y, int flags, void* data)
     cp->scissor->MouseCallback(event, x, y);
 }
 
-void text(Mat& image, const char texts[9][50])
+void text(Mat& image, const char texts[11][50])
 {
     int h = image.rows, w = image.cols;
-    for(int i = 0; i < 9; i++)
-        putText(image, texts[8-i], Point(0, h-1 - i*50-20), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
+    for(int i = 0; i < 11; i++)
+        putText(image, texts[10-i], Point(0, h-1 - i*50-20), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
 }
 
 void onSaveContour(int state, void* data)
@@ -41,7 +41,14 @@ void onSaveLasso(int state, void* data)
 void onCrop(int state, void* data)
 {
     CallbackParam* cp = (CallbackParam*)data;
-    Mat crop = cp->scissor->Crop();
+    Mat crop = cp->scissor->Crop(false);
+    imshow("Cropped", crop);
+}
+
+void onInverseCrop(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    Mat crop = cp->scissor->Crop(true);
     imshow("Cropped", crop);
 }
 
@@ -116,12 +123,14 @@ int main(int argc, char** argv)
     namedWindow("Canvas", WINDOW_AUTOSIZE);
     moveWindow("Canvas", 1000, 0);
     setMouseCallback("Canvas", mouseCallback, (void*)&cp);
-    cvCreateTrackbar("Blur", "Canvas", &degree, 9, NULL);
+    cvCreateTrackbar("Blur", "Canvas", &degree, 21, NULL);
 
     createButton("Save Contour", onSaveContour, (void*)&cp);
     createButton("Save Mask", onSaveMask, (void*)&cp);
     createButton("Save Lasso", onSaveLasso, (void*)&cp);
+    cvCreateTrackbar("  ", NULL, &dummy, 1, NULL);
     createButton("Crop", onCrop, (void*)&cp);
+    createButton("Inverse Crop", onInverseCrop, (void*)&cp);
     cvCreateTrackbar("Nodes", NULL, &cp.nodes, 50000, NULL);
     createButton("Cost Graph", onCostGraph, (void*)&cp);
     createButton("Edge Graph", onEdgeGraph, (void*)&cp);
@@ -163,7 +172,12 @@ int main(int argc, char** argv)
             scissor.ToggleSnap();
         else if(key == 'c')
         {
-            Mat crop = scissor.Crop();
+            Mat crop = scissor.Crop(false);
+            imshow("Cropped", crop);
+        }
+        else if(key == 'i')
+        {
+            Mat crop = scissor.Crop(true);
             imshow("Cropped", crop);
         }
         else if(key == 'v')
@@ -176,18 +190,20 @@ int main(int argc, char** argv)
         }
         else if(key == 'h')
         {
-            char texts[9][50] = {
+            char texts[11][50] = {
                 "Left  Mouse  - insert seed",
                 "Mid   Mouse  - reset",
+                "<ctrl> + <p> - display toolbox",
                 "<q>          - quit",
                 "<bkspace>    - remove last seed",
                 "<s>          - save contour to file",
                 "<e>          - toggle edge snapping",
                 "<c>          - crop with contour",
+                "<i>          - inverse crop with contour",
                 "<v>          - visualize edge and cost graph",
                 "<h>          - display this help page"};
 
-            Mat help = Mat::zeros(Size(900, 500), CV_8UC3);
+            Mat help = Mat::zeros(Size(900, 550), CV_8UC3);
             text(help, texts);
             imshow("HELP" , help);
         }
