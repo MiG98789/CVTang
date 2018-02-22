@@ -435,7 +435,11 @@ Mat Scissor::Crop(bool isInverse)
 
     //Mask original image by contour and crop by bounding rect
     finalize.copyTo(cropped, mask);
-    cropped = cropped(bound);
+
+    if (!isInverse)
+    {
+        cropped = cropped(bound);
+    }
 
     return cropped;
 }
