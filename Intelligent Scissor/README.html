@@ -33,16 +33,60 @@
 
 	<div class="container-fluid bg-3">
 		<h3>Artifact</h3>
+		<h4>Pomegrandpa and Pomelola</h4>
 		<img src="../resources/proj1/artifact/artifact.png">
-
 		<br>
-
-		<h3>How It Works</h3>
-		<p>Once the program starts running, an image is loaded onto the GUI. There, the user can choose to blur the image with a Gaussian
-			blur, where the kernel size can be adjusted with the provided slider. By clicking anywhere on the image, the first seed's
-			position is selected. Any consecutive clicks afterwards will choose the next seeds' locations, where the next seed is
-			linked to the previous seed by calculating the cost graph, then a wire is drawn between the two seeds by following the
-			minimum cost path. Finally, the user may extract the desired subimage by cropping according to the contour.</p>
+		<br>
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Original Image</th>
+					<th>Mask</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<img src="../resources/proj1/artifact/queen.jpeg">
+					</td>
+					<td>
+						<img src="../resources/proj1/artifact/queen_mask.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="../resources/proj1/artifact/pomelo.jpeg">
+					</td>
+					<td>
+						<img src="../resources/proj1/artifact/pomelo_mask.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="../resources/proj1/artifact/pomegranate.jpg">
+					</td>
+					<td>
+						<img src="../resources/proj1/artifact/pomegranate_mask.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="../resources/proj1/artifact/spongebob_mom.png">
+					</td>
+					<td>
+						<img src="../resources/proj1/artifact/spongebob_mom_mask.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="../resources/proj1/artifact/spongebob_dad.png">
+					</td>
+					<td>
+						<img src="../resources/proj1/artifact/spongebob_dad_mask.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
 
 		<br>
 
@@ -291,6 +335,7 @@
 					<td>
 						If a user presses &lt;h&gt;, a help window will be opened as shown below.
 
+						<br>
 						<br>
 
 						<img src="../resources/proj1/results/help.png">
