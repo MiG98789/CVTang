@@ -61,6 +61,7 @@ class Scissor
 
         void Draw(Mat& canvas);
         void PathTree(Mat& tree, int nodes);
+        void ImagelessPathTree(Mat& tree, int nodes);
         void MouseCallback(int event, int x, int y);
 };
 

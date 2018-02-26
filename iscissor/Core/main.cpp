@@ -83,7 +83,7 @@ void onPathTree(int state, void* data)
 {
     CallbackParam* cp = (CallbackParam*)data;
     Mat tree;
-    cp->scissor->PathTree(tree, cp->nodes);
+    cp->scissor->ImagelessPathTree(tree, cp->nodes);
     imshow("Path tree", tree);
 }
 
