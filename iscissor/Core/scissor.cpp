@@ -149,7 +149,7 @@ void Scissor::ImagelessPathTree(Mat& tree, int nodes)
 {
     int h = finalize.rows;
     int w = finalize.cols;
-    tree = Mat::zeros(Size(2 * w, 2 * h), CV_8UC3);
+    tree = Mat::zeros(Size(3 * w, 3 * h), CV_8UC3);
 
     for(int i = 0; i < nodes && i < explore.size(); i++)
     {
@@ -160,7 +160,7 @@ void Scissor::ImagelessPathTree(Mat& tree, int nodes)
             Point p = route[size - j - 2], p1 = route[size - j - 1];
             int ox = p1.x - p.x;
             int oy = p1.y - p.y;
-            tree.at<Vec3b>(2*p.y+1+oy, 2*p.x+1+ox) = Vec3b(0, 255, 0);
+            tree.at<Vec3b>(3*p.y+1+oy, 3*p.x+1+ox) = Vec3b(0, 255, 0);
         }
     }
 }
