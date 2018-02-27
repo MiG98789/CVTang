@@ -137,7 +137,7 @@ int main(int argc, char** argv)
     cvCreateTrackbar("  ", NULL, &dummy, 1, NULL);
     createButton("Crop", onCrop, (void*)&cp);
     createButton("Inverse Crop", onInverseCrop, (void*)&cp);
-    cvCreateTrackbar("Nodes", NULL, &cp.nodes, 50000, NULL);
+    cvCreateTrackbar("Nodes", NULL, &cp.nodes, 100000, NULL);
     createButton("Cost Graph", onCostGraph, (void*)&cp);
     createButton("Edge Graph", onEdgeGraph, (void*)&cp);
     createButton("Pixel Graph", onPixel, (void*)&cp);
