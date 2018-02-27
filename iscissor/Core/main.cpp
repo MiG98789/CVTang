@@ -83,7 +83,7 @@ void onPathTree(int state, void* data)
 {
     CallbackParam* cp = (CallbackParam*)data;
     Mat tree;
-    cp->scissor->ImagelessPathTree(tree, cp->nodes);
+    cp->scissor->PathTree(tree, cp->nodes);
     imshow("Path tree", tree);
 }
 
@@ -120,10 +120,10 @@ void onMinPath(int state, void* data)
 int main(int argc, char** argv)
 {
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
-    resize(image, image, Size(), argc < 3? 0.5: atof(argv[2]), argc < 3? 0.5: atof(argv[2]));
+    resize(image, image, Size(), argc < 3? 0.2: atof(argv[2]), argc < 3? 0.2: atof(argv[2]));
 
     Scissor scissor(image);
-    CallbackParam cp = {&scissor, false};
+    CallbackParam cp = {&scissor, false, image.rows*image.cols};
 
     int prev = 0, degree = 0, dummy = 0;
     namedWindow("Canvas", WINDOW_AUTOSIZE);
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
     cvCreateTrackbar("  ", NULL, &dummy, 1, NULL);
     createButton("Crop", onCrop, (void*)&cp);
     createButton("Inverse Crop", onInverseCrop, (void*)&cp);
-    cvCreateTrackbar("Nodes", NULL, &cp.nodes, 100000, NULL);
+    cvCreateTrackbar("Nodes", NULL, &cp.nodes, image.rows*image.cols, NULL);
     createButton("Cost Graph", onCostGraph, (void*)&cp);
     createButton("Edge Graph", onEdgeGraph, (void*)&cp);
     createButton("Pixel Graph", onPixel, (void*)&cp);
