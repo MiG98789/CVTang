@@ -1,7 +1,7 @@
 #include "define.h"
 #include "scissor.h"
 
-Scissor::Scissor(const Mat& image): snap(false), hide(false), cost(image.rows, image.cols, 8), link(image.rows, image.cols)
+Scissor::Scissor(const Mat& image): snap(false), hide(false), tree(false), cost(image.rows, image.cols, 8), link(image.rows, image.cols)
 {
     original = image.clone();
     finalize = image.clone();
@@ -163,6 +163,11 @@ void Scissor::ImagelessPathTree(Mat& tree, int nodes)
             tree.at<Vec3b>(3*p.y+1+oy, 3*p.x+1+ox) = Vec3b(0, 255, 0);
         }
     }
+}
+
+Point Scissor::Tree(Point point)
+{
+    return tree? point * 3 + 1: point;
 }
 
 Point Scissor::Snap(Point cursor)
@@ -328,27 +333,31 @@ vector<Point> Scissor::Trace(Point seed, Point cursor)
 void Scissor::Draw(Mat& draw_canvas)
 {
     path.lock = true;
-    canvas = finalize.clone();
+
+    if(tree)
+        canvas = minpath.clone();
+    else
+        canvas = finalize.clone();
 
     if(!hide)
     {
         //draw lines for all previously recorded seed point to seed point trails
         for(int i = 0; i < path.trail.size(); i++)
             for(int j = 0; j < (int)path.trail[i].size() - 1; j++)
-                line(canvas, path.trail[i][j], path.trail[i][j+1], Scalar(0, 0, 255), 2);
+                line(canvas, Tree(path.trail[i][j]), Tree(path.trail[i][j+1]), Scalar(0, 0, 255), 2);
 
         if(path.seeds.size() > 0)
         {
             path.mouse = Trace(path.seeds.back(), path.cursor);
             for(int i = 0; i < (int)path.mouse.size() - 1; i++)
-                line(canvas, path.mouse[i], path.mouse[i+1], Scalar(0, 0, 255), 2);
+                line(canvas, Tree(path.mouse[i]), Tree(path.mouse[i+1]), Scalar(0, 0, 255), 2);
 
             //pathut empathhasis on seed pathoints by drawing green dots
             for(int i = 0; i < path.seeds.size(); i++)
-                circle(canvas, path.seeds[i], 3, Scalar(0, 255, 0), -1);
+                circle(canvas, Tree(path.seeds[i]), 3, Scalar(0, 255, 0), -1);
         }
 
-        circle(canvas, path.cursor, 3, snap? Scalar(255, 0, 255): Scalar(0, 255, 0), -1);
+        circle(canvas, Tree(path.cursor), 3, snap? Scalar(255, 0, 255): Scalar(0, 255, 0), -1);
     }
 
     draw_canvas = canvas.clone();
@@ -357,6 +366,9 @@ void Scissor::Draw(Mat& draw_canvas)
 
 void Scissor::OnClick()
 {
+    if(tree)
+        return;
+
     if(snap)
     {
         path.seeds.back() = Snap(path.seeds.back());
@@ -435,6 +447,14 @@ void Scissor::ToggleHide()
     cout << "Hide " << (hide? "on": "off") << endl;
 }
 
+void Scissor::ToggleTree()
+{
+    tree = !tree;
+    if(tree)
+        ImagelessPathTree(minpath, original.rows * original.cols);
+    cout << "Min Path " << (tree? "on": "off") << endl;
+}
+
 Mat Scissor::Crop(bool isInverse)
 {
     Mat cropped;
@@ -467,9 +487,10 @@ Mat Scissor::Crop(bool isInverse)
 void Scissor::MouseCallback(int event, int x, int y)
 {
     while(path.lock);
-    if(event == EVENT_LBUTTONUP)
+    Point p = tree? Point(x/3, y/3): Point(x, y);
+    if(event == EVENT_LBUTTONUP && !tree)
         //Set seed point to trigger path tree compute
-        path.seeds.push_back(Point(x, y));
+        path.seeds.push_back(p);
     else if(event == EVENT_MBUTTONUP)
     {
         //Reset all points when middle mouse click
@@ -478,6 +499,6 @@ void Scissor::MouseCallback(int event, int x, int y)
         path.mouse.clear();
     }
     else if(event == EVENT_MOUSEMOVE)
-        path.cursor = snap? Snap(Point(x, y)): Point(x, y);
+        path.cursor = snap? Snap(p): p;
 }
 

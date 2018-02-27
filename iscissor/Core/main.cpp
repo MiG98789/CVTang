@@ -111,6 +111,12 @@ void onCloseContour(int state, void* data)
     cp->scissor->CloseContour();
 }
 
+void onMinPath(int state, void* data)
+{
+    CallbackParam* cp = (CallbackParam*)data;
+    cp->scissor->ToggleTree();
+}
+
 int main(int argc, char** argv)
 {
     Mat canvas, image = imread(argc == 1? "curless.png": argv[1], CV_LOAD_IMAGE_COLOR);
@@ -136,7 +142,8 @@ int main(int argc, char** argv)
     createButton("Edge Graph", onEdgeGraph, (void*)&cp);
     createButton("Pixel Graph", onPixel, (void*)&cp);
     createButton("Path Tree", onPathTree, (void*)&cp);
-    cvCreateTrackbar("  ", NULL, &dummy, 1, NULL);
+    createButton("Min Path", onMinPath, (void*)&cp);
+    cvCreateTrackbar("   ", NULL, &dummy, 1, NULL);
     createButton("Pop Seed", onPopSeed, (void*)&cp);
     createButton("Snapping", onSnap, (void*)&cp);
     createButton("Contour", onHide, (void*)&cp);
