@@ -151,6 +151,17 @@ void Scissor::ImagelessPathTree(Mat& tree, int nodes)
     int w = finalize.cols;
     tree = Mat::zeros(Size(3 * w, 3 * h), CV_8UC3);
 
+    Point2i currSeed = path.seeds.back();
+
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            tree.at<Vec3b>(3*currSeed.y+1+j, 3*currSeed.x+1+i) = Vec3b(0, 125, 125);
+        }
+    }
+    
+
     for(int i = 0; i < nodes && i < explore.size(); i++)
     {
         vector<Point> route = Trace(path.seeds.back(), explore[i]);
@@ -161,7 +172,11 @@ void Scissor::ImagelessPathTree(Mat& tree, int nodes)
             int ox = p1.x - p.x;
             int oy = p1.y - p.y;
             tree.at<Vec3b>(3*p.y+1+oy, 3*p.x+1+ox) = Vec3b(0, 255, 0);
+            tree.at<Vec3b>(3*p.y+1, 3*p.x+1) = Vec3b(0, 255, 0);
+            tree.at<Vec3b>(3*p1.y+1-oy, 3*p1.x+1-ox) = Vec3b(0,255,0);
         }
+
+        tree.at<Vec3b>(3*route[0].y+1,3*route[0].x+1) = Vec3b(0,255,0);
     }
 }
 
