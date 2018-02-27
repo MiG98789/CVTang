@@ -138,4 +138,14 @@ struct Path
     bool lock = false;
 };
 
+inline Point operator*(Point p, int value)
+{
+    return Point(p.x * value, p.y * value);
+}
+
+inline Point operator+(Point p, int value)
+{
+    return Point(p.x + value, p.y + value);
+}
+
 #endif

@@ -11,6 +11,7 @@ class Scissor
     private:
         bool snap;
         bool hide;
+        bool tree;
 
         vector<Point> explore;
 
@@ -20,6 +21,7 @@ class Scissor
 
         Mat original;
         Mat finalize;
+        Mat minpath;
         Mat visual;
         Mat canvas;
         Mat pixel;
@@ -28,6 +30,7 @@ class Scissor
 
         int NeighborCost(Point q, Point r);
         Point Snap(Point cursor);
+        Point Tree(Point point);
 
     public:
         Scissor(const Mat& image);
@@ -42,6 +45,7 @@ class Scissor
         void OnClick();
         void PopSeed();
         void ToggleSnap();
+        void ToggleTree();
         void ToggleHide();
         void CloseContour();
         void SetBlur(int degree);
