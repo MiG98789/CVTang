@@ -31,5 +31,14 @@ function features_pos = get_positive_features(train_path_pos, feature_params)
 image_files = dir( fullfile( train_path_pos, '*.jpg') ); %Caltech Faces stored as .jpg
 num_images = length(image_files);
 
-% placeholder to be deleted
-features_pos = rand(100, (feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
+D = (feature_params.template_size / feature_params.hog_cell_size)^2 * 31;
+features_pos = zeros(num_images, D);
+
+for i = 1:num_images
+    im = imread(strcat(image_files(i).folder, '\', image_files(i).name));
+    hog = vl_hog(single(im), feature_params.hog_cell_size);
+    features_pos(i,:) = reshape(hog, 1, D);
+%    disp(hog); imhog = vl_hog('render', hog, 'verbose'); clf; imagesc(imhog); colormap gray;
+end
+end
+ 

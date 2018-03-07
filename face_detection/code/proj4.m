@@ -37,7 +37,7 @@
 % This should work on 32 and 64 bit versions of Windows, MacOS, and Linux
 close all
 clear
-run('vlfeat/toolbox/vl_setup')
+run('\\VDIDRIVE\MYHOME\gmsdelmundo\Documents\MATLAB\vlfeat/toolbox/vl_setup')
 
 [~,~,~] = mkdir('visualizations');
 
@@ -73,8 +73,9 @@ features_neg = get_random_negative_features( non_face_scn_path, feature_params, 
 % work best e.g. 0.0001, but you can try other values
 
 %YOU CODE classifier training. Make sure the outputs are 'w' and 'b'.
-w = rand((feature_params.template_size / feature_params.hog_cell_size)^2 * 31,1); %placeholder, delete
-b = rand(1); %placeholder, delete
+X = [features_pos; features_neg]';
+Y = [ones(size(features_pos, 1), 1); -1.*ones(size(features_neg, 1), 1)];
+[w, b] = vl_svmtrain(X, Y, 0.0001);
 
 %% step 3. Examine learned classifier
 % You don't need to modify anything in this section. The section first
