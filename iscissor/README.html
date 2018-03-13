@@ -15,7 +15,11 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 	<style>
-		.baw {
+		body {
+			font-size: 20px;
+		}
+
+		.bolditalic {
 			font-weight: bold;
 			font-style: italic;
 		}
@@ -42,7 +46,7 @@
 						<a href="#">Intelligent Scissor</a>
 					</li>
 					<li>
-						<a href="../face_detection/index.html">Face Detection</a>
+						<a href="../face_detection/html/index.html">Face Detection</a>
 					</li>
 					<li>
 						<a href="../svm/index.html">Single View Modeling</a>
@@ -214,7 +218,7 @@
 			<tbody>
 				<tr>
 					<td>
-						<span class="baw">[Listed]</span> Modify the interface and program to allow blurring the image by different amounts before computing
+						<span class="bolditalic">[Listed]</span> Modify the interface and program to allow blurring the image by different amounts before computing
 						link costs. Describe your observations on how this changes the results.</td>
 					<td>The image can be smoothed with a Gaussian blur, where the kernel size can be adjusted from 0 to 9 using the slider bar
 						present on the GUI. Below are the results of using kernels of size 0, 5, 9, and 21.
@@ -294,7 +298,7 @@
 
 				<tr>
 					<td>
-						<span class="baw">[Listed]</span> The only point that doesn't snap to edges is the seed. Implement a seed snapping feature, where the
+						<span class="bolditalic">[Listed]</span> The only point that doesn't snap to edges is the seed. Implement a seed snapping feature, where the
 						seed is automatically moved to the closest edge.</td>
 					<td>To toggle the seed snapping feature, the user simply presses the <mark class="code">&lt;v&gt;</mark> hotkey, which turns the seed red instead
 						of the usual green. As the user drags the cursor around the image, the seed will automatically snap to the closest
@@ -310,7 +314,7 @@
 
 				<tr>
 					<td>
-						<span class="baw">[Unlisted]</span> After drawing the lasso on the image, users can choose to crop the image at any time, which will
+						<span class="bolditalic">[Unlisted]</span> After drawing the lasso on the image, users can choose to crop the image at any time, which will
 						be opened in a separate window.</td>
 					<td>
 						After the user has selected at least one seed, pressing <mark class="code">&lt;c&gt;</mark> will open a window with the area enclosed by all the seeds
@@ -342,7 +346,7 @@
 
 				<tr>
 					<td>
-						<span class="baw">[Unlisted]</span> Instead of cropping the image to what is enclosed within the contours, crop that region out instead
+						<span class="bolditalic">[Unlisted]</span> Instead of cropping the image to what is enclosed within the contours, crop that region out instead
 						to perform an inverse crop.</td>
 					<td>
 						If a user presses <mark class="code">&lt;i&gt;</mark>, inverse crop will be performed as shown below.
@@ -377,7 +381,7 @@
 
 				<tr>
 					<td>
-						<span class="baw">[Unlisted]</span> Users can scale the image size before running the program.</td>
+						<span class="bolditalic">[Unlisted]</span> Users can scale the image size before running the program.</td>
 					<td>
 							If a user specifies the scale factor when executing the program in terminal, the image size displayed will be multiplied by that scale factor as shown below.
 
@@ -411,7 +415,7 @@
 
 				<tr>
 					<td>
-						<span class="baw">[Unlisted]</span> A help window is opened to show users what each hotkey does.</td>
+						<span class="bolditalic">[Unlisted]</span> A help window is opened to show users what each hotkey does.</td>
 					<td>
 						If a user presses <mark class="code">&lt;h&gt;</mark>, a help window will be opened as shown below.
 

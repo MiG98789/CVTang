@@ -3,251 +3,245 @@
 
 <head>
 	<title>COMP5421 (Spring 2018) - Project 2: Face Detection Write Up</title>
-	<link rel="stylesheet" title="Default" href="styles/github.css">
-	
+
 	<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-	<link rel="stylesheet" href="highlighting/styles/default.css">
-	<script src="highlighting/highlight.pack.js"></script>
 
 	<style type="text/css">
-	body {
-		margin: 0px;
-		width: 100%;
-		font-size: 20px;
-		background: #fcfcfc;
-	}
-	h1 {
-		font-weight: normal;
-		font-size: 28px;
-		margin: 25px 0px 0px 0px;
-	}
+		body {
+			margin: 0px;
+			width: 100%;
+			font-size: 20px;
+			background: #fcfcfc;
+		}
 
-	h2 {
-		font-weight: normal;
-		font-size: 32px;
-		margin: 15px 0px 35px 0px;
-		color: #333;	
-		word-spacing: 3px;
-	}
+		p,
+		li {
+			color: #444;
+		}
 
-	h3 {
-		font-weight: normal;
-		font-size: 26px;
-		margin: 10px 0px 10px 0px;
-		color: #333;
-		word-spacing: 2px;
-	}
-	
-	h4 {
-		font-weight: normal;
-		font-size: 22px;
-		margin: 10px 0px 10px 0px;
-		color: #333;
-		word-spacing: 2px;
-	}
+		a {
+			color: #DE3737;
+		}
 
-	h5 {
-		font-weight: normal;
-		font-size: 18px;
-		margin: 10px 0px 10px 0px;
-		color: #111;
-		word-spacing: 2px;
-	}
+		.container {
+			margin: 0px auto 0px auto;
+			width: 1160px;
+		}
 
-	p, li {
-		color: #444;
-	}
+		#header {
+			background: #333;
+			width: 100%;
+		}
 
-	a {
-		color: #DE3737;
-	}
+		#headersub {
+			color: #ccc;
+			width: 960px;
+			margin: 0px auto 0px auto;
+			padding: 20px 0px 20px 0px;
+		}
 
-	.container {
-		margin: 0px auto 0px auto;
-		width: 1160px;
-	}
+		.chart {
+			width: 480px;
+		}
 
-	#header {
-		background: #333;
-		width: 100%;
-	}
+		.lol {
+			font-size: 16px;
+			color: #888;
+			font-style: italic;
+		}
 
-	#headersub {
-		color: #ccc;
-		width: 960px;
-		margin: 0px auto 0px auto;
-		padding: 20px 0px 20px 0px;
-	}
+		.sep {
+			height: 1px;
+			width: 100%;
+			background: #999;
+			margin: 20px 0px 20px 0px;
+		}
 
-	.chart {
-		width: 480px;
-	}
-	
-	.lol {
-		font-size: 16px;
-		color: #888;
-		font-style: italic;
-	}
-	
-	.sep {
-		height: 1px;
-		width: 100%;
-		background: #999;
-		margin: 20px 0px 20px 0px;
-	}
-	
-	.footer {
-		font-size: 16px;
-	}
-	
-	.latex {
-		width: 100%;
-	}
+		.footer {
+			font-size: 16px;
+		}
 
-	.latex img {
-		display: block;
-		margin: 0px auto 0px auto;
-	}
+		.latex {
+			width: 100%;
+		}
 
-	pre {
-		font-family: 'Droid Sans Mono';
-		font-size: 14px;
-	}
+		.latex img {
+			display: block;
+			margin: 0px auto 0px auto;
+		}
 
-	table td {
-	  text-align: center;
-	  vertical-align: middle;
-	}
+		pre {
+			font-family: 'Droid Sans Mono';
+			font-size: 14px;
+		}
 
-	table td img {
-	  text-align: center;
-	  vertical-align: middle;
-	}
+		table td {
+			text-align: center;
+			vertical-align: middle;
+		}
 
-	#contents a {
-	}
+		table td img {
+			text-align: center;
+			vertical-align: middle;
+		}
+
+		.italibold {
+			font-weight: bold;
+			font-style: italic;
+		}
 	</style>
-	
+
 	<script type="text/javascript">
 		hljs.initHighlightingOnLoad();
 	</script>
 </head>
 
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html">COMP5421</a>
-            </div>
-            <div class="collapse navbar-collapse" id="myNavbar">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="../iscissor/README.html">Intelligent Scissor</a>
-                    </li>
-                    <li>
-                        <a href="../face_detection/index.html">Face Detection</a>
-                    </li>
-                    <li>
-                        <a href="../svm/index.html">Single View Modeling</a>
-                    </li>
-                    <li>
-                        <a href="../photo/index.html">Multiple-view Modeling</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="../../index.html">COMP5421</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav">
+					<li>
+						<a href="../../iscissor/README.html">Intelligent Scissor</a>
+					</li>
+					<li>
+						<a href="../../face_detection/html/index.html">Face Detection</a>
+					</li>
+					<li>
+						<a href="../../svm/index.html">Single View Modeling</a>
+					</li>
+					<li>
+						<a href="../../photo/index.html">Multiple-view Modeling</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-    <div class="jumbotron">
-        <div class="container text-center">
-            <h1>COMP5421 (Spring 2018) - Project 2: Face Detection Write Up</h1>
-            <br>
-            <p>CHIU, Man Tik | DEL MUNDO, Gian Miguel Sero</p>
-        </div>
-    </div>
+	<div class="jumbotron">
+		<div class="container text-center">
+			<h1>COMP5421 (Spring 2018) - Project 2: Face Detection Write Up</h1>
+			<br>
+			<p>CHIU, Man Tik | DEL MUNDO, Gian Miguel Sero</p>
+		</div>
+	</div>
 
-<div class="container">
-<div style="float: right; padding: 20px">
-<img src="placeholder.jpg" />
-<p style="font-size: 14px">Example of a right floating element.</p>
-</div>
+	<div class="container container-fluid bg-3">
+		<h1>Technical Details and Implementation Decisions</h1>
+		<h2>Baseline Algorithm</h2>
+		<p>To create an SVM model for face detection, it needs to be trained on face and non-face data as the positive and negative
+			features respectively. The provided dataset provides two data groups, which are faces and non-faces. The faces are all
+			cropped 36x36 images, while the non-faces have different dimensions.
 
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<br>
+			<br>To extract positive features, the HoG of faces are extracted. As for negative features, a random 36*36 sample of each
+			non-face is taken, which is then converted to its HoG.
 
-<ol>
-<li>list element 1.</li>
-<li>list element 2.</li>
-<li>etc.</li>
-</ol>
+			<br>
+			<br>With the positive and negative features extracted, they are then used to train the SVM model. After training, the SVM
+			can be used to detect faces in an image.
 
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<br>
+			<br>To detect faces of various sizes in an image, the image is first scaled with manually defined factors. HoG features are
+			then extracted from each scaled image. Using a sliding window approach, the HoG feature space is traversed with predefined
+			stride, where the feature subspace is fed into the trained SVM to obtain a face confidence score.
 
-<div style="clear:both">
-<h3>Example heading</h3>
+			<br>
+			<br>At the same time, the bounding boxes traversed in the HoG features are translated into image coordinates, this is done
+			by first multiplying the HoG window coordinates with cell_size to obtain scaled image pixels, and then divided by the
+			scale factor to obtain the coordinates from the original image.
 
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<br>
+			<br>When sliding window is complete, the bounding boxes are filtered, where only bounding boxes with face confidence score
+			of over a threshold (0.9) is kept. All filtered bounding boxes are then passed to the non-max supression to remove overlapping
+			regions. The remaining bounding boxes are the multi-scale face detection results.
 
-<h2>Example of code with highlighting</h2>
-The javascript in the <code>highlighting</code> folder is configured to do syntax highlighting in code blocks such as the one below.<p>
+			<br>
+			<br>
 
-<pre><code>
-%example code
-for i = 1:length(offset)
-    source = imread(sprintf('%s/source_%02d.jpg',data_dir,i));
-    mask   = imread(sprintf('%s/mask_%02d.jpg',data_dir,i));
-    target = imread(sprintf('%s/target_%02d.jpg',data_dir,i));
+			<h2>Extra Features</h2>
+			<h3>Hard Negative Mining</h3>
+			Implementation of hard negative mining is done by modifying the run_detector function. Instead of finding faces from images,
+			hard negative mining tries to find false positives from images that do not contain any faces.
 
-</code></pre>
+			<br>
+			<br>To mine hard negatives, each image that does not contain any faces is fed into a process similar to run_detector, i.e.
+			scaling, sliding window, SVM prediction and confidence threshold filtering. However, rather than returning the image bounding
+			boxes, hard negative mining returns the HoG features with confidence score higher than a threshold (0.9). These are essentially
+			false positives since we know they are not faces, and are therefore returned as additional negative training samples.
 
-<h3>Results in a table</h3>
+			<br>
+			<br>Therefore, after running hard negative mining, another SVM is trained with the original dataset plus the additional mined
+			hard negatives.
 
-<table border=1>
-<tr>
-<td>
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg"  width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-</td>
-</tr>
+			<br>
+			<br>
 
-<tr>
-<td>
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg"  width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-</td>
-</tr>
+			<h3>Data Augmentation</h3>
+			Common approaches to data augmentation includes image flipping, rotation, scaling, etc. However, HoG features has requirement
+			of upright face orientation, which renders image rotation ineffective in this domain. Nevertheless, it is found that contrast
+			adjustments may be helpful in obtaining clearer face contours, and hence improve HoG feature extraction and the resulting
+			face detection performance.
 
-</table>
+			<br>
+			<br>Therefore, considering the fact that our HoG window is of fixed size, and face is mirror-invariant, i.e. flipped faces
+			should still be easily recognized as faces, we carried out data augmentation by horizontal image flipping and contrast
+			adjustment. The resulting positive training sample size is hence four times the original amount.
 
-<center>
-<p>
-Face template HoG visualization for the starter code. This is completely random, but it should actually look like a face once you train a reasonable classifier.
-<p>
-<img src="hog_template.png">
-<p>
-Precision Recall curve for the starter code.
-<p>
-<img src="average_precision.png">
-<p>
-Example of detection on the test set from the starter code.
-<img src="detections_Argentina.jpg.png">
+			<br>
+			<br>
 
-</center>
+			<h2>Implementation Decisions</h2>
+			<h3>
+				<code>run_detector.m</code> Implementation</h3>
+			Originally, as a more comprehensible and simpler implementation, vector appending was used instead of initializing empty
+			matrices for storing bounding boxes, results and image ids. However, it was soon noticed that vector appending is extremely
+			inefficient compared to matrix initialization.
 
-<div style="clear:both" >
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-</div>
+			<br>
+			<br>Upon refactoring the implementation to matrix initialization, the running time of training and testing has dramatically
+			shortened.
+
+			<br>
+			<br>
+
+			<h3>Image and HoG Feature Coordinate Translation</h3>
+			The image pixel space and the HoG feature space has different dimensions. Therefore, when carrying out sliding window on
+			the HoG space, the corresponding image coordinates must also be computed in order to keep track of the image bounding
+			boxes.
+
+			<br>
+			<br>In the sliding window iterations, steps are expressed in terms of HoG feature dimensions, this is because comparing to
+			translating from image coordinates to HoG coordinates during iterations, the inverse has higher readibility and simpler
+			structure, where less functions are used inside the loops, e.g. floor(), size(), etc.
+
+			<br>
+			<br>
+
+			<h3>Contrast adjustment in data augmentation</h3>
+			Contrast can be adjusted in many different ways, such as scaling by a constant. Yet, to most effectly emphasize edges and
+			contours in an image, it is believed that spreading the image color space across the entire 0-255 domain would be most
+			effective. Therefore, instead of defining a scale factor for image contrasts, each training face image color space is
+			redistributed across the entire black-and-white color space.
+		</p>
+
+		<br>
+		<br>
+
+		<h1>Performance</h1>
+	</div>
 </body>
+
 </html>
