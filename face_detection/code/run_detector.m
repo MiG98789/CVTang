@@ -46,6 +46,12 @@ bboxes = zeros(0,4);
 confidences = zeros(0,1);
 image_ids = cell(0,1);
 
+c_size = feature_params.hog_cell_size;
+t_size = feature_params.template_size;
+window = (t_size/c_size);
+D = window^2 * 31;
+scale = [0.01, 0.02, 0.05:0.05:1];
+
 for i = 1:length(test_scenes)
       
     fprintf('Detecting faces in %s\n', test_scenes(i).name)
@@ -54,15 +60,49 @@ for i = 1:length(test_scenes)
     if(size(img,3) > 1)
         img = rgb2gray(img);
     end
+
+    cur_confidences = zeros(0, 1);
+    cur_bboxes = zeros(0, 4);
+    cur_image_ids = cell(0, 1);
+
+    for s = scale
+        scaled_img = imresize(img, s);
+
+        hog = vl_hog(single(scaled_img), c_size);
+
+        %Get how many windows are in the image
+        countx = floor((size(scaled_img, 2) - t_size) /c_size) + 1;
+        county = floor((size(scaled_img, 1) - t_size) /c_size) + 1;
+
+        scaled_features = zeros(countx*county, D);
+        scaled_bboxes = zeros(countx*county, 4);
+        scaled_image_ids = cell(countx*county, 1);
+
+        for stepx = 1:countx
+            for stepy = 1:county
+                %Get hog of a window and append it to features
+                sub_hog = hog(stepy:stepy+window-1, stepx:stepx+window-1, :);
+                scaled_features((stepx-1)*county+stepy, :) = reshape(sub_hog, 1, D);
+
+                %Add label and translate hog subwindow coordinate to image coordinate
+                scaled_bboxes((stepx-1)*county+stepy, :) = [c_size*(stepx-1)+1, c_size*(stepy-1)+1, c_size*(stepx+window-1), c_size*(stepy+window-1)]./s;
+                scaled_image_ids((stepx-1)*county+stepy, :) = {test_scenes(i).name};
+            end
+        end
+
+        %Use score output as filtering for all entries
+        scores = scaled_features * w + b;
+        filter = find(scores > 0.9);
+        scaled_confidences = scores(filter, :);
+        scaled_bboxes = scaled_bboxes(filter, :);
+        scaled_image_ids = scaled_image_ids(filter, :);
+
+        cur_confidences = [cur_confidences; scaled_confidences];
+        cur_bboxes = [cur_bboxes; scaled_bboxes];
+        cur_image_ids = [cur_image_ids; scaled_image_ids];
+    end
     
-    %You can delete all of this below.
-    % Let's create 15 random detections per image
-    cur_x_min = rand(15,1) * size(img,2);
-    cur_y_min = rand(15,1) * size(img,1);
-    cur_bboxes = [cur_x_min, cur_y_min, cur_x_min + rand(15,1) * 50, cur_y_min + rand(15,1) * 50];
-    cur_confidences = rand(15,1) * 4 - 2; %confidences in the range [-2 2]
-    cur_image_ids(1:15,1) = {test_scenes(i).name};
-    
+
     %non_max_supr_bbox can actually get somewhat slow with thousands of
     %initial detections. You could pre-filter the detections by confidence,
     %e.g. a detection with confidence -1.1 will probably never be

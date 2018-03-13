@@ -38,7 +38,6 @@ for i = 1:num_images
     im = imread(strcat(image_files(i).folder, '\', image_files(i).name));
     hog = vl_hog(single(im), feature_params.hog_cell_size);
     features_pos(i,:) = reshape(hog, 1, D);
-%    disp(hog); imhog = vl_hog('render', hog, 'verbose'); clf; imagesc(imhog); colormap gray;
 end
 end
  
