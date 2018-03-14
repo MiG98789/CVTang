@@ -204,8 +204,7 @@
 			<br>
 
 			<h2>1.3 - Implementation Decisions</h2>
-			<h3>1.3.1 -
-				<code>run_detector.m</code> Implementation</h3>
+			<h3>1.3.1 - <code>run_detector.m</code> Implementation</h3>
 			Originally, as a more comprehensible and simpler implementation, vector appending was used instead of initializing empty
 			matrices for storing bounding boxes, results and image ids. However, it was soon noticed that vector appending is extremely
 			inefficient compared to matrix initialization.
@@ -241,6 +240,280 @@
 		<br>
 
 		<h1>2 - Performance</h1>
+		For all evaluations, unless otherwise specified, the parameters are:
+		<br>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>File</th>
+					<th>Function/Variable</th>
+					<th>Parameter and Value</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td rowspan="2">
+						<code>proj4.m</code>
+					</td>
+					<td>
+						<code>Variable</code>
+					</td>
+					<td>
+						<code>feature_params.template_size = 36</code><br>
+						<code>feature_params.hog_cell_size = 6</code><br>
+						<code>num_negative_examples = 10000</code>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>vl_svmtrain()</code>
+					</td>
+					<td>
+						<code>lambda = 0.0001</code>
+					</td>
+				</tr>
+				
+				<tr>
+					<td rowspan="2">
+						<code>run_detector.m</code>
+					</td>
+					<td>
+						<code>Variable</code>
+					</td>
+					<td>
+						<code>scale = [0.01, 0.02, 0.05:0.05:1]</code><br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>find()</code>
+					</td>
+					<td>
+						<code>scores > 0.9</code>
+					</td>
+				</tr>
+				
+				<tr>
+					<td rowspan="2">
+						<code>run_mine_detector.m</code>
+					</td>
+					<td>
+						<code>Variable</code>
+					</td>
+					<td>
+						<code>scale = [0.01, 0.02, 0.05:0.05:1]</code><br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>find()</code>
+					</td>
+					<td>
+						<code>scores > 0.5</code>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h2>2.1 - CMU + MIT Scenes</h2>
+		<h3>2.1.1 - Average Precision</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline-precision.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg-precision.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment-precision.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.1.2 - HoG Visualizations</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline-hog.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg-hog.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment-hog.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.1.3 - Sample Output</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline-arsenal.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg-arsenal.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment-arsenal.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h2> 2.2 - Bonus Scenes</h2>
+		<h3>2.2.1 - Average Precision</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="bonus-baseline-precision.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="bonus-hardneg-precision.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="bonus-augment-precision.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.2.2 - HoG Visualizations</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="bonus-baseline-hog.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="bonus-hardneg-hog.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="bonus-augment-hog.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.2.3 - Sample Output</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="bonus-baseline-arsenal.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="bonus-hardneg-arsenal.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="bonus-augment-arsenal.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </body>
 
