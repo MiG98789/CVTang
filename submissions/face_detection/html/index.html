@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>COMP5421 (Spring 2018) - Project 2: Face Detection Write Up</title>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+		body {
+			margin: 0px;
+			width: 100%;
+			font-size: 20px;
+			background: #fcfcfc;
+		}
+
+		p,
+		li {
+			color: #444;
+		}
+
+		a {
+			color: #DE3737;
+		}
+
+		.container {
+			margin: 0px auto 0px auto;
+			width: 1160px;
+		}
+
+		#header {
+			background: #333;
+			width: 100%;
+		}
+
+		#headersub {
+			color: #ccc;
+			width: 960px;
+			margin: 0px auto 0px auto;
+			padding: 20px 0px 20px 0px;
+		}
+
+		.chart {
+			width: 480px;
+		}
+
+		.lol {
+			font-size: 16px;
+			color: #888;
+			font-style: italic;
+		}
+
+		.sep {
+			height: 1px;
+			width: 100%;
+			background: #999;
+			margin: 20px 0px 20px 0px;
+		}
+
+		.footer {
+			font-size: 16px;
+		}
+
+		.latex {
+			width: 100%;
+		}
+
+		.latex img {
+			display: block;
+			margin: 0px auto 0px auto;
+		}
+
+		pre {
+			font-family: 'Droid Sans Mono';
+			font-size: 14px;
+		}
+
+		table td {
+			text-align: center;
+			vertical-align: middle;
+		}
+
+		table td img {
+			text-align: center;
+			vertical-align: middle;
+		}
+
+		.italibold {
+			font-weight: bold;
+			font-style: italic;
+		}
+	</style>
+
+	<script type="text/javascript">
+		hljs.initHighlightingOnLoad();
+	</script>
+</head>
+
+<body>
+	<div class="jumbotron">
+		<div class="container text-center">
+			<h1>COMP5421 (Spring 2018) - Project 2: Face Detection Write Up</h1>
+			<br>
+			<p>CHIU, Man Tik | DEL MUNDO, Gian Miguel Sero</p>
+		</div>
+	</div>
+
+	<div class="container container-fluid bg-3">
+		<h1>1 - Technical Details and Implementation Decisions</h1>
+		<h2>1.1 - Baseline Algorithm</h2>
+		<p>To create an SVM model for face detection, it needs to be trained on face and non-face data as the positive and negative
+			features respectively. The provided dataset provides two data groups, which are faces and non-faces. The faces are all
+			cropped 36x36 images, while the non-faces have different dimensions.
+
+			<br>
+			<br>To extract positive features, the HoG of faces are extracted. As for negative features, a random 36x36 sample of each
+			non-face is taken, which is then converted to its HoG.
+
+			<br>
+			<br>With the positive and negative features extracted, they are then used to train the SVM model. After training, the SVM
+			can be used to detect faces in an image.
+
+			<br>
+			<br>To detect faces of various sizes in an image, the image is first scaled with manually defined factors. HoG features are
+			then extracted from each scaled image. Using a sliding window approach, the HoG feature space is traversed with predefined
+			stride, where the feature subspace is fed into the trained SVM to obtain a face confidence score.
+
+			<br>
+			<br>At the same time, the bounding boxes traversed in the HoG features are translated into image coordinates, this is done
+			by first multiplying the HoG window coordinates with cell_size to obtain scaled image pixels, and then divided by the
+			scale factor to obtain the coordinates from the original image.
+
+			<br>
+			<br>When sliding window is complete, the bounding boxes are filtered, where only bounding boxes with face confidence score
+			of over a threshold (we chose 0.8) is kept. All filtered bounding boxes are then passed to the non-max supression to remove overlapping
+			regions. The remaining bounding boxes are the multi-scale face detection results.
+
+			<br>
+			<br>
+
+			<h2>1.2 - Extra Features</h2>
+			<h3>1.2.1 - Hard Negative Mining</h3>
+			Implementation of hard negative mining is done by modifying the <code>run_detector</code> function. Instead of finding faces from images,
+			hard negative mining tries to find false positives from images that do not contain any faces.
+
+			<br>
+			<br>To mine hard negatives, each image that does not contain any faces is fed into a process similar to run_detector, i.e.
+			scaling, sliding window, SVM prediction and confidence threshold filtering. However, rather than returning the image bounding
+			boxes, hard negative mining returns the HoG features with confidence score higher than a threshold (we chose 0.8). These are essentially
+			false positives since we know they are not faces, and are therefore returned as additional negative training samples.
+
+			<br>
+			<br>Therefore, after running hard negative mining, another SVM is trained with the original dataset plus the additional mined
+			hard negatives.
+
+			<br>
+			<br>
+
+			<h3>1.2.2 - Data Augmentation</h3>
+			Common approaches to data augmentation includes image flipping, rotation, scaling, etc. However, HoG features has requirement
+			of upright face orientation, which renders image rotation ineffective in this domain. Nevertheless, it is found that contrast
+			adjustments may be helpful in obtaining clearer face contours, and hence improve HoG feature extraction and the resulting
+			face detection performance.
+
+			<br>
+			<br>Therefore, considering the fact that our HoG window is of fixed size, and face is mirror-invariant, i.e. flipped faces
+			should still be easily recognized as faces, we carried out data augmentation by horizontal image flipping and contrast
+			adjustment. The resulting positive training sample size is hence four times the original amount.
+
+			<br>
+			<br>
+
+			<h2>1.3 - Implementation Decisions</h2>
+			<h3>1.3.1 - <code>run_detector.m</code> Implementation</h3>
+			Originally, as a more comprehensible and simpler implementation, vector appending was used instead of initializing empty
+			matrices for storing bounding boxes, results and image ids. However, it was soon noticed that vector appending is extremely
+			inefficient compared to matrix initialization.
+
+			<br>
+			<br>Upon refactoring the implementation to matrix initialization, the running time of training and testing has dramatically
+			shortened.
+
+			<br>
+			<br>
+
+			<h3>1.3.2 - Image and HoG Feature Coordinate Translation</h3>
+			The image pixel space and the HoG feature space has different dimensions. Therefore, when carrying out sliding window on
+			the HoG space, the corresponding image coordinates must also be computed in order to keep track of the image bounding
+			boxes.
+
+			<br>
+			<br>In the sliding window iterations, steps are expressed in terms of HoG feature dimensions, this is because comparing to
+			translating from image coordinates to HoG coordinates during iterations, the inverse has higher readibility and simpler
+			structure, where less functions are used inside the loops, e.g. floor(), size(), etc.
+
+			<br>
+			<br>
+
+			<h3>1.3.3 - Contrast Adjustment in Data Augmentation</h3>
+			Contrast can be adjusted in many different ways, such as scaling by a constant. Yet, to most effectly emphasize edges and
+			contours in an image, it is believed that spreading the image color space across the entire 0-255 domain would be most
+			effective. Therefore, instead of defining a scale factor for image contrasts, each training face image color space is
+			redistributed across the entire black-and-white color space.
+		</p>
+
+		<br>
+		<br>
+
+		<h1>2 - Performance</h1>
+		For all evaluations, unless otherwise specified, the parameters are:
+		<br>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>File</th>
+					<th>Function/Variable</th>
+					<th>Parameter and Value</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td rowspan="2">
+						<code>proj4.m</code>
+					</td>
+					<td>
+						<code>Variable</code>
+					</td>
+					<td>
+						<code>feature_params.template_size = 36</code><br>
+						<code>feature_params.hog_cell_size = 3</code><br>
+						<code>num_negative_examples = 20000</code>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>vl_svmtrain()</code>
+					</td>
+					<td>
+						<code>lambda = 0.0001</code>
+					</td>
+				</tr>
+				
+				<tr>
+					<td rowspan="2">
+						<code>run_detector.m</code>
+					</td>
+					<td>
+						<code>Variable</code>
+					</td>
+					<td>
+						<code>scale = [0.01, 0.02, 0.05:0.05:1]</code><br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>find()</code>
+					</td>
+					<td>
+						<code>scores > 0.8</code>
+					</td>
+				</tr>
+				
+				<tr>
+					<td rowspan="2">
+						<code>run_mine_detector.m</code>
+					</td>
+					<td>
+						<code>Variable</code>
+					</td>
+					<td>
+						<code>scale = [0.01, 0.02, 0.05:0.05:1]</code><br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<code>find()</code>
+					</td>
+					<td>
+						<code>scores > 0.8</code>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.1 - Average Precision</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline-precision.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg-precision.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment-precision.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.2 - HoG Visualizations</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline-hog.jpg" width="70%">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg-hog.jpg">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment-hog.jpg">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h3>2.3 - Sample CMU+MIT Output</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline-arsenal.jpg" width="100%">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg-arsenal.jpg" width="50%">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment-arsenal.jpg" width="50%">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<h3>2.4 - Extra Scenes Output</h3>
+		<table class="table table-bordered table-hover">
+			<tbody>
+				<tr>
+					<td>
+						Baseline Algorithm
+					</td>
+					<td>
+						<img src="baseline_class_easy.jpg" width="50%"/>
+						<img src="baseline_class_easy_01.jpg"  width="50%"/>
+						<img src="baseline_class_easy_02.jpg" width="50%"/>
+						<img src="baseline_class_hard.jpg"  width="50%"/>
+						<img src="baseline_class_hard_01.jpg" width="50%"/>
+						<img src="baseline_class_hard_02.jpg"  width="50%"/>
+						<img src="baseline_class_hard_03.jpg" width="50%"/>
+						<img src="baseline_faculty.jpg"  width="50%"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hard Negative Mining
+					</td>
+					<td>
+						<img src="hardneg_class_easy.jpg" width="50%"/>
+						<img src="hardneg_class_easy_01.jpg"  width="50%"/>
+						<img src="hardneg_class_easy_02.jpg" width="50%"/>
+						<img src="hardneg_class_hard.jpg"  width="50%"/>
+						<img src="hardneg_class_hard_01.jpg" width="50%"/>
+						<img src="hardneg_class_hard_02.jpg"  width="50%"/>
+						<img src="hardneg_class_hard_03.jpg" width="50%"/>
+						<img src="hardneg_faculty.jpg"  width="50%"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Data Augmentation
+					</td>
+					<td>
+						<img src="augment_class_easy.jpg" width="50%"/>
+						<img src="augment_class_easy_01.jpg"  width="50%"/>
+						<img src="augment_class_easy_02.jpg" width="50%"/>
+						<img src="augment_class_hard.jpg"  width="50%"/>
+						<img src="augment_class_hard_01.jpg" width="50%"/>
+						<img src="augment_class_hard_02.jpg"  width="50%"/>
+						<img src="augment_class_hard_03.jpg" width="50%"/>
+						<img src="augment_faculty.jpg"  width="50%"/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br>
+		<br>
+		
+		<h1>3 - Observations</h1>
+		The best average precision obtained was 0.928, where hard negative mining was not used and data augmentation was used.
+		
+		<h2>3.1 - Hard Negative Mining</h2>
+		With hard negative mining, average precision decreased from 0.919 to 0.813 compared to the baseline. This may be due to the fact that hard negative mining creates more negative/non-face training data, but not more positive/face training data.
+		
+		<br>
+		<br>Since positive images are "clean data faces", their HoG features should closely resemble faces. So, if there are any false positives, it means that there are some intricate details between faces and the false positive that should be adjusted. Hence, performing hard negative mining is like telling the SVM model that these features that were close to faces should not be classified as faces, making the model more conservative and detect less faces.
+		
+		<br>
+		<br>Due to this, the number of false positives decreased, but so did the number of true positives. As in, the SVM model became more conservative in face detection.
+		
+		<h2>3.2 - Data Augmentation</h2>
+		With data augmentation, average precision increased slightly from 0.919 to 0.928 compared to the baseline. This may be due to the fact that there are more positive/face training data, giving the SVM model more features to learn from. This allows the model to generalise better, and hence, detect more faces.
+	</div>
+</body>
+
+</html>
