@@ -92,7 +92,7 @@ for i = 1:length(test_scenes)
 
         %Use score output as filtering for all entries
         scores = scaled_features * w + b;
-        filter = find(scores > 0.9);
+        filter = find(scores > 0.8);
         scaled_confidences = scores(filter, :);
         scaled_bboxes = scaled_bboxes(filter, :);
         scaled_image_ids = scaled_image_ids(filter, :);

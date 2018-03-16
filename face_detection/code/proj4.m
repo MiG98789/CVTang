@@ -52,15 +52,15 @@ label_path = fullfile(data_path,'test_scenes/ground_truth_bboxes.txt'); %the gro
 %add other fields to this struct if you want to modify HoG default
 %parameters such as the number of orientations, but that does not help
 %performance in our limited test.
-feature_params = struct('template_size', 36, 'hog_cell_size', 6);
+feature_params = struct('template_size', 36, 'hog_cell_size', 3);
 
 
 %% Step 1. Load positive training crops and random negative examples
 %YOU CODE 'get_positive_features' and 'get_random_negative_features'
 
-features_pos = get_augmented_positive_features( train_path_pos, feature_params );
+features_pos = get_positive_features( train_path_pos, feature_params );
 
-num_negative_examples = 10000; %Higher will work strictly better, but you should start with 10000 for debugging
+num_negative_examples = 20000; %Higher will work strictly better, but you should start with 10000 for debugging
 features_neg = get_random_negative_features( non_face_scn_path, feature_params, num_negative_examples);
 
     
@@ -120,11 +120,11 @@ imwrite(hog_template_image, 'visualizations/hog_template.png')
 % you probably want to modify 'run_detector', run the detector on the
 % images in 'non_face_scn_path', and keep all of the features above some
 % confidence level.
-[hard_negatives] = run_mine_detector(non_face_scn_path, w, b, feature_params);
+% [hard_negatives] = run_mine_detector(non_face_scn_path, w, b, feature_params);
 
-X = [X'; hard_negatives]';
-Y = [Y; -1.*ones(size(hard_negatives, 1), 1)];
-[w, b] = vl_svmtrain(X, Y, 0.0001);
+% X = [X'; hard_negatives]';
+% Y = [Y; -1.*ones(size(hard_negatives, 1), 1)];
+% [w, b] = vl_svmtrain(X, Y, 0.0001);
 
 %% Step 5. Run detector on test set.
 % YOU CODE 'run_detector'. Make sure the outputs are properly structured!

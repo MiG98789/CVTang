@@ -79,7 +79,7 @@ for i = 1:length(non_face_scenes)
 
         %Use score output as filtering for all entries
         scores = scaled_features * w + b;
-        filter = find(scores > 0.5);
+        filter = find(scores > 0.8);
 
         %Extract false positive features and append to negative examples
         hard_negatives = [hard_negatives; scaled_features(filter, :)];
