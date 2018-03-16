@@ -14,6 +14,7 @@
 	<!-- Latest compiled JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+	<link rel="icon" href="../../resources/comp5421-logo.gif">
 
 	<style type="text/css">
 		body {
@@ -472,10 +473,16 @@
 		The best average precision obtained was 0.928, where hard negative mining was not used and data augmentation was used.
 		
 		<h2>3.1 - Hard Negative Mining</h2>
-		With hard negative mining, average precision decreased from 0.919 to 0.813 compared to the baseline. This may be due to the fact that hard negative mining creates more non-face training data, but not more face training data. Due to this, the number of false positives decreased, but so did the number of true positives. As in, the SVM model became more conservative in face detection.
+		With hard negative mining, average precision decreased from 0.919 to 0.813 compared to the baseline. This may be due to the fact that hard negative mining creates more negative/non-face training data, but not more positive/face training data.
+		
+		<br>
+		<br>Since positive images are "clean data faces", their HoG features should closely resemble faces. So, if there are any false positives, it means that there are some intricate details between faces and the false positive that should be adjusted. Hence, performing hard negative mining is like telling the SVM model that these features that were close to faces should not be classified as faces, making the model more conservative and detect less faces.
+		
+		<br>
+		<br>Due to this, the number of false positives decreased, but so did the number of true positives. As in, the SVM model became more conservative in face detection.
 		
 		<h2>3.2 - Data Augmentation</h2>
-		With data augmentation, average precision increased slightly from 0.919 to 0.928 compared to the baseline. This may be due to the fact that more training data is generated for faces but not non-faces. Due to this, the number of true positives increases, but so did the number of false positives.
+		With data augmentation, average precision increased slightly from 0.919 to 0.928 compared to the baseline. This may be due to the fact that there are more positive/face training data, giving the SVM model more features to learn from. This allows the model to generalise better, and hence, detect more faces.
 	</div>
 </body>
 
