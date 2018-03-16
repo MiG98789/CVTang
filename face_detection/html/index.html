@@ -179,7 +179,7 @@
 			<br>
 			<br>To mine hard negatives, each image that does not contain any faces is fed into a process similar to run_detector, i.e.
 			scaling, sliding window, SVM prediction and confidence threshold filtering. However, rather than returning the image bounding
-			boxes, hard negative mining returns the HoG features with confidence score higher than a threshold (0.9). These are essentially
+			boxes, hard negative mining returns the HoG features with confidence score higher than a threshold (0.8). These are essentially
 			false positives since we know they are not faces, and are therefore returned as additional negative training samples.
 
 			<br>
@@ -260,8 +260,8 @@
 					</td>
 					<td>
 						<code>feature_params.template_size = 36</code><br>
-						<code>feature_params.hog_cell_size = 6</code><br>
-						<code>num_negative_examples = 10000</code>
+						<code>feature_params.hog_cell_size = 3</code><br>
+						<code>num_negative_examples = 20000</code>
 					</td>
 				</tr>
 				<tr>
@@ -289,7 +289,7 @@
 						<code>find()</code>
 					</td>
 					<td>
-						<code>scores > 0.9</code>
+						<code>scores > 0.8</code>
 					</td>
 				</tr>
 				
@@ -309,7 +309,7 @@
 						<code>find()</code>
 					</td>
 					<td>
-						<code>scores > 0.5</code>
+						<code>scores > 0.8</code>
 					</td>
 				</tr>
 			</tbody>
@@ -464,6 +464,18 @@
 				</tr>
 			</tbody>
 		</table>
+		
+		<br>
+		<br>
+		
+		<h1>3 - Observations</h1>
+		The best precision obtained was 0.928, where hard negative mining was not used and data augmentation was used.
+		
+		<h2>3.1 - Hard Negative Mining</h2>
+		With hard negative mining, average precision decreased by x compared to the baseline. This may be due to the fact that hard negative mining creates more non-face training data, but not more face training data. Due to this, the number of false positives decreased, but so did the number of true positives.
+		
+		<h2>3.2 - Data Augmentation</h2>
+		More data = ggez
 	</div>
 </body>
 
