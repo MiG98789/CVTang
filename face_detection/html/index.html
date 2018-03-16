@@ -146,7 +146,7 @@
 			cropped 36x36 images, while the non-faces have different dimensions.
 
 			<br>
-			<br>To extract positive features, the HoG of faces are extracted. As for negative features, a random 36*36 sample of each
+			<br>To extract positive features, the HoG of faces are extracted. As for negative features, a random 36x36 sample of each
 			non-face is taken, which is then converted to its HoG.
 
 			<br>
@@ -165,7 +165,7 @@
 
 			<br>
 			<br>When sliding window is complete, the bounding boxes are filtered, where only bounding boxes with face confidence score
-			of over a threshold (0.9) is kept. All filtered bounding boxes are then passed to the non-max supression to remove overlapping
+			of over a threshold (we chose 0.8) is kept. All filtered bounding boxes are then passed to the non-max supression to remove overlapping
 			regions. The remaining bounding boxes are the multi-scale face detection results.
 
 			<br>
@@ -173,13 +173,13 @@
 
 			<h2>1.2 - Extra Features</h2>
 			<h3>1.2.1 - Hard Negative Mining</h3>
-			Implementation of hard negative mining is done by modifying the run_detector function. Instead of finding faces from images,
+			Implementation of hard negative mining is done by modifying the <code>run_detector</code> function. Instead of finding faces from images,
 			hard negative mining tries to find false positives from images that do not contain any faces.
 
 			<br>
 			<br>To mine hard negatives, each image that does not contain any faces is fed into a process similar to run_detector, i.e.
 			scaling, sliding window, SVM prediction and confidence threshold filtering. However, rather than returning the image bounding
-			boxes, hard negative mining returns the HoG features with confidence score higher than a threshold (0.8). These are essentially
+			boxes, hard negative mining returns the HoG features with confidence score higher than a threshold (we chose 0.8). These are essentially
 			false positives since we know they are not faces, and are therefore returned as additional negative training samples.
 
 			<br>
@@ -359,7 +359,7 @@
 						Baseline Algorithm
 					</td>
 					<td>
-						<img src="baseline-hog.jpg">
+						<img src="baseline-hog.jpg" width="70%">
 					</td>
 				</tr>
 				<tr>
@@ -392,7 +392,7 @@
 						Baseline Algorithm
 					</td>
 					<td>
-						<img src="baseline-arsenal.jpg">
+						<img src="baseline-arsenal.jpg" width="100%">
 					</td>
 				</tr>
 				<tr>
@@ -400,7 +400,7 @@
 						Hard Negative Mining
 					</td>
 					<td>
-						<img src="hardneg-arsenal.jpg">
+						<img src="hardneg-arsenal.jpg" width="50%">
 					</td>
 				</tr>
 				<tr>
@@ -408,7 +408,7 @@
 						Data Augmentation
 					</td>
 					<td>
-						<img src="augment-arsenal.jpg">
+						<img src="augment-arsenal.jpg" width="50%">
 					</td>
 				</tr>
 			</tbody>
@@ -469,13 +469,13 @@
 		<br>
 		
 		<h1>3 - Observations</h1>
-		The best precision obtained was 0.928, where hard negative mining was not used and data augmentation was used.
+		The best average precision obtained was 0.928, where hard negative mining was not used and data augmentation was used.
 		
 		<h2>3.1 - Hard Negative Mining</h2>
-		With hard negative mining, average precision decreased by x compared to the baseline. This may be due to the fact that hard negative mining creates more non-face training data, but not more face training data. Due to this, the number of false positives decreased, but so did the number of true positives.
+		With hard negative mining, average precision decreased from 0.919 to 0.813 compared to the baseline. This may be due to the fact that hard negative mining creates more non-face training data, but not more face training data. Due to this, the number of false positives decreased, but so did the number of true positives. As in, the SVM model became more conservative in face detection.
 		
 		<h2>3.2 - Data Augmentation</h2>
-		More data = ggez
+		With data augmentation, average precision increased slightly from 0.919 to 0.928 compared to the baseline. This may be due to the fact that more training data is generated for faces but not non-faces. Due to this, the number of true positives increases, but so did the number of false positives.
 	</div>
 </body>
 
