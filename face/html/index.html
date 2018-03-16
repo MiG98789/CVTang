@@ -472,6 +472,9 @@
 		<h1>3 - Observations</h1>
 		The best average precision obtained was 0.928, where hard negative mining was not used and data augmentation was used.
 		
+		<br>
+		<br>
+		
 		<h2>3.1 - Hard Negative Mining</h2>
 		With hard negative mining, average precision decreased from 0.919 to 0.813 compared to the baseline. This may be due to the fact that hard negative mining creates more negative/non-face training data, but not more positive/face training data.
 		
@@ -480,6 +483,9 @@
 		
 		<br>
 		<br>Due to this, the number of false positives decreased, but so did the number of true positives. As in, the SVM model became more conservative in face detection.
+		
+		<br>
+		<br>
 		
 		<h2>3.2 - Data Augmentation</h2>
 		With data augmentation, average precision increased slightly from 0.919 to 0.928 compared to the baseline. This may be due to the fact that there are more positive/face training data, giving the SVM model more features to learn from. This allows the model to generalise better, and hence, detect more faces.
