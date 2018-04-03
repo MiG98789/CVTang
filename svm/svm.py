@@ -10,6 +10,7 @@ from numpy.linalg import norm
 line_mode = 0 #0 for x, 1 for y, 2 for z, -1 for ref_points
 vanish_points = [[], [], []]
 reference_points = []
+reference_length = []
 origin_point = []
 line_colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 point_colors = [(255, 255, 0), (255, 0, 255), (0, 255, 255)]
@@ -61,19 +62,15 @@ def compute_vanish_line(pts, h, w):
 
     return V
 
-def compute_scale(V, ref_pts, origin, h, w):
+def compute_scale(V, ref_pts, ref_len, origin, h, w):
     origin = np.array(origin + (1,))
     ref_pt = np.array([pt + (1,) for pt in ref_pts])
 
     a = [None] * 3
     for dim in range(3):
-        ref_len = norm(origin - ref_pt[dim])
-
-        print 'ref len', dim, ':', ref_len
-
         a[dim] = np.linalg.lstsq(
                 (V[dim] - ref_pt[dim,:])[:,None],
-                (ref_pt[dim,:] - origin)[:,None])[0]/ref_len
+                (ref_pt[dim,:] - origin)[:,None])[0]/ref_len[dim]
 
     return np.array(a).flatten()
 
@@ -149,6 +146,15 @@ def main():
         elif key == ord('o'):
             line_mode = -2
 
+        elif key == ord('d'):
+            sys.stdout.write('Input reference lengths along x, y, z respectively: ')
+            sys.stdout.flush()
+            try:
+                reference_length = [float(x) for x in raw_input().split(' ')]
+                print 'Lengths recorded'
+            except:
+                print 'Invalid input'
+
         elif key == 13:
             if all([len(v) >= 4 for v in vanish_points]):
                 V = compute_vanish_line(vanish_points, h, w)
@@ -157,7 +163,16 @@ def main():
                 print 'Vz', V[2]
 
                 if len(reference_points) >= 3 and len(origin_point) == 1:
-                    a = compute_scale(V, reference_points, origin_point[0], h, w)
+                    if len(reference_length) == 0:
+                        sys.stdout.write('Input reference lengths along x, y, z respectively: ')
+                        sys.stdout.flush()
+                        try:
+                            reference_length = [float(x) for x in raw_input().split(' ')]
+                            print 'Lengths recorded'
+                        except:
+                            print 'Invalid input'
+
+                    a = compute_scale(V, reference_points, reference_length, origin_point[0], h, w)
                     print 'ax', a[0]
                     print 'ay', a[1]
                     print 'az', a[2]
@@ -171,7 +186,6 @@ def main():
                     cv2.imshow('xy', images[0])
                     cv2.imshow('yz', images[1])
                     cv2.imshow('xz', images[2])
-                    cv2.waitKey(0)
                     print 'Transformed'
                 else:
                     print 'Reference points definition not complete'
@@ -196,7 +210,7 @@ def main():
 
         #---Load and save---#
         elif key == ord('s'):
-            data = {'points': vanish_points, 'ref_points': reference_points, 'origin_point': origin_point}
+            data = {'points': vanish_points, 'ref_points': reference_points, 'ref_lens': reference_length, 'origin_point': origin_point}
             with open(image_file.split('.')[0] + '.json', 'w') as f:
                 json.dump(data, f, indent=4)
             print 'Vanishing points saved'
@@ -205,6 +219,7 @@ def main():
                 data = json.load(f)
             vanish_points = [[tuple(y) for y in x] for x in data['points']]
             reference_points = [tuple(x) for x in data['ref_points']]
+            reference_length = data['ref_lens']
             origin_point = [tuple(x) for x in data['origin_point']]
         #---#
 
