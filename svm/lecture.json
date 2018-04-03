@@ -1,5 +1,10 @@
 {
     "ref_points": [], 
+    "ref_lens": [
+        10,
+        10,
+        10
+    ],
     "points": [
         [
             [

@@ -18,7 +18,7 @@ reference_colors = [(255, 102, 153), (51, 255, 102)]
 origin_color = (0, 0, 0)
 
 def mouse_callback(event, x, y, flags, prams):
-    global line_mode, vanish_points, reference_line
+    global line_mode, vanish_points, reference_line, count
 
     if event == cv2.EVENT_LBUTTONUP:
         if line_mode == -1:
@@ -29,6 +29,7 @@ def mouse_callback(event, x, y, flags, prams):
                 origin_point.append((x, y))
         else:
             vanish_points[line_mode].append((x, y))
+
     elif event == cv2.EVENT_MBUTTONUP:
         if line_mode == -1:
             if len(reference_points) > 0:
@@ -103,7 +104,7 @@ def transform(image, H):
     return images
 
 def main():
-    global line_mode, vanish_points, reference_points, origin_point
+    global line_mode, vanish_points, reference_points, reference_length, origin_point
     image_file = sys.argv[1] if len(sys.argv) > 1 else 'lecture.jpg'
     image = cv2.imread(image_file)
     if image is None:
@@ -171,6 +172,9 @@ def main():
                             print 'Lengths recorded'
                         except:
                             print 'Invalid input'
+                    print 'Rx', reference_length[0]
+                    print 'Ry', reference_length[1]
+                    print 'Rz', reference_length[2]
 
                     a = compute_scale(V, reference_points, reference_length, origin_point[0], h, w)
                     print 'ax', a[0]
