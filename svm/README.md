@@ -16,6 +16,7 @@ COMP5421 Project 3
 
 ## Note
 
+* If image.json exists, simply run the program and press 'l' then 'Entr' to compute
 * Number of axis points is unlimited but must be even
 * Number of reference points must be 3
 * Number of origin point must be 1
