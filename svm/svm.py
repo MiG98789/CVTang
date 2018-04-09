@@ -3,6 +3,7 @@
 import sys
 import cv2
 import json
+import os
 import numpy as np
 import scipy.sparse.linalg as sla
 from numpy.linalg import norm
@@ -15,7 +16,6 @@ reference_length = []
 origin_point = []
 base_interest_point = []
 interest_point = []
-texture_points = []
 line_colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 point_colors = [(255, 255, 0), (255, 0, 255), (0, 255, 255)]
 reference_colors = [(255, 102, 153), (51, 255, 102)]
@@ -141,14 +141,6 @@ def main():
     cv2.moveWindow("canvas", 1000,350)
     cv2.setMouseCallback('canvas', mouse_callback)
 
-    print '1) Define more than 2 parallel lines along each of x, y, z axis.'
-    print '2) Define 2 reference points along the x- and y-axis on the z=0 plane, and 1 reference point on the z-axis.'
-    print '3) Define origin point.'
-    print '4) Input lengths from each of the reference points to origin.'
-    print '5) Compute everything and displays image warps.'
-    print '6) Define interest points for the 3D model.'
-    print '7) Produce the VRML file.'
-
     while True:
         canvas = image.copy()
         for plane in range(3):
@@ -229,8 +221,8 @@ def main():
         elif key == ord('i'):
             select_interest_points = 'y'
             three_d_points = []
+            texture_points = []
 
-            texmap_name = raw_input('Input texture map name: ')
             while select_interest_points.lower() == 'y':
                 line_mode = -3
                 if len(base_interest_point) > 0:
@@ -299,8 +291,59 @@ def main():
             print '\n'.join(str(point) for point in three_d_points)
             line_mode = 0
 
-        elif key == ord('v'):
-            print 'a'
+            texture_file = raw_input('Input texture map file name: ')
+            texture = cv2.imread(texture_file)
+            if texture is None:
+                print 'Read image file failed'
+                sys.exit(1)
+            
+            texture_name = texture_file[::-1].split('.', 1)[-1].split('/')[0][::-1]
+            texture_height, texture_width, _ = texture.shape
+            
+            for three_d_point in three_d_points:
+                sys.stdout.write('Input texture map coordinates for %s: ' % (three_d_point,))
+                sys.stdout.flush()
+                texture_point = []
+                try:
+                    texture_point = [float(x) for x in raw_input().split(' ')]
+                    print 'Texture pixel point recorded'
+                except:
+                    print 'Invalid input'
+                texture_points.append([texture_point[0]/texture_width, (texture_height - texture_point[1])/texture_height])
+                print 'Adding texture point at %s' % (texture_points[-1],)
+            print 'All texture points added:'
+            print '\n'.join(str(point) for point in texture_points)
+
+            image_name = image_file[::-1].split('.', 1)[-1].split('/')[0][::-1]
+            wrl_file = 'model/' + image_name + '.txt'
+            if not os.path.exists(wrl_file):
+                with open(wrl_file, 'w') as f:
+                    f.write('#VRML V2.0 utf8\n\nCollision {\n collide FALSE\n children [\n ]\n }')
+            lines = ''
+            with open(wrl_file, 'r') as f:
+                lines = f.readlines()
+            with open(wrl_file, 'w') as f:
+                for line in lines[:-2]:
+                    f.write(line)
+            with open(wrl_file, 'a') as f:
+                f.write('\n Shape {\n  appearance Appearance {\n   texture ImageTexture {\n   url "')
+                f.write(texture_name + '.gif')
+                f.write('"\n  }  \n  }\n   geometry IndexedFaceSet {\n   coord Coordinate {\n   point [\n')
+                for point in three_d_points:
+                    f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ' ' + str(point[2]) + ', \n')
+                f.write('\n   ]\n   }\n   coordIndex [\n    ')
+                for i in range(len(three_d_points)):
+                    f.write(str(i) + ',')
+                f.write('-1')
+                f.write('\n   ]\n   texCoord TextureCoordinate {\n    point [\n')
+                for point in texture_points:
+                    f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ', \n')
+                f.write('\n    ]\n   }\n   texCoordIndex [\n    ')
+                for i in range(len(texture_points)):
+                    f.write(str(i) + ',')
+                f.write('-1')
+                f.write('\n   ]\n   solid FALSE\n  }\n}')
+                f.write('\n ] \n}')
         #---#
 
         #---Utils---#

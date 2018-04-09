@@ -43,7 +43,6 @@ COMP5421 Project 3
 'o'    	    #Define origin
         
 'i'    	    #Define interest points
-'v'    	    #Generate VRML file
 
 'd'    	    #Prompts to input lengths of reference points in CMD
 'Entr' 	    #Calculates and displays warped images
