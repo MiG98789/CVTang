@@ -9,10 +9,12 @@ COMP5421 Project 3
 ```
 
 1) Define more than 2 parallel lines along each of x, y, z axis.
-2) Define 3 reference points on the z=0 plane.
+2) Define 2 reference points along the x- and y-axis on the z=0 plane, and 1 reference point on the z-axis.
 3) Define origin point.
 4) Input lengths from each of the reference points to origin.
 5) Compute everything and displays image warps.
+6) Define interest points for the 3D model.
+7) Produce the VRML file.
 
 ## Note
 
@@ -40,7 +42,10 @@ COMP5421 Project 3
 'r'    	    #Define reference points
 'o'    	    #Define origin
         
-'d'    	    #Prompts to input lengths of refernce points in CMD
+'i'    	    #Define interest points
+'v'    	    #Generate VRML file
+
+'d'    	    #Prompts to input lengths of reference points in CMD
 'Entr' 	    #Calculates and displays warped images
 ```
 

@@ -6,12 +6,16 @@ import json
 import numpy as np
 import scipy.sparse.linalg as sla
 from numpy.linalg import norm
+from scipy.linalg import solve
 
-line_mode = 0 #0 for x, 1 for y, 2 for z, -1 for ref_points
+line_mode = 0 #1 for x, 2 for y, 3 for z, -1 for ref_points, -2 for origin, -3 for base_interest_point, -4 for interest_point
 vanish_points = [[], [], []]
 reference_points = []
 reference_length = []
 origin_point = []
+base_interest_point = []
+interest_point = []
+texture_points = []
 line_colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 point_colors = [(255, 255, 0), (255, 0, 255), (0, 255, 255)]
 reference_colors = [(255, 102, 153), (51, 255, 102)]
@@ -21,30 +25,48 @@ def mouse_callback(event, x, y, flags, prams):
     global line_mode, vanish_points, reference_line, count
 
     if event == cv2.EVENT_LBUTTONUP:
-        if line_mode == -1:
+        if line_mode == 0:
+            pass
+        elif line_mode == -1:
             if len(reference_points) < 3:
                 reference_points.append((x, y))
         elif line_mode == -2:
             if len(origin_point) == 0:
                 origin_point.append((x, y))
+        elif line_mode == -3:
+            if len(base_interest_point) == 0:
+                base_interest_point.append((x,y,1))
+        elif line_mode == -4:
+            if len(interest_point) == 0:
+                interest_point.append((x,y,1))
         else:
-            vanish_points[line_mode].append((x, y))
+            vanish_points[line_mode - 1].append((x, y))
 
     elif event == cv2.EVENT_MBUTTONUP:
-        if line_mode == -1:
+        if line_mode == 0:
+            pass
+        elif line_mode == -1:
             if len(reference_points) > 0:
                 del reference_points[-1]
         elif line_mode == -2:
             if len(origin_point) > 0:
                 del origin_point[-1]
-        elif len(vanish_points[line_mode]) > 0:
-            del vanish_points[line_mode][-1]
+        elif line_mode == -3:
+            if len(base_interest_point) > 0:
+                del base_interest_point[-1]
+        elif line_mode == -3:
+            if len(interest_point) > 0:
+                del interest_point[-1]
+        elif len(vanish_points[line_mode - 1]) > 0:
+            del vanish_points[line_mode - 1][-1]
 
 def normalize(v):
     return np.array(v) / norm(v)
 
-def compute_vanish_line(pts, h, w):
+def ssq(a):
+    return np.sum(a**2)
 
+def compute_vanish_line(pts, h, w):
     V = [None] * 3
 
     for dim in range(3):
@@ -116,8 +138,16 @@ def main():
 
     cv2.namedWindow('canvas',cv2.WINDOW_NORMAL)
     cv2.resizeWindow('canvas', 900, 900)
-    cv2.moveWindow("canvas", 1000,350);
+    cv2.moveWindow("canvas", 1000,350)
     cv2.setMouseCallback('canvas', mouse_callback)
+
+    print '1) Define more than 2 parallel lines along each of x, y, z axis.'
+    print '2) Define 2 reference points along the x- and y-axis on the z=0 plane, and 1 reference point on the z-axis.'
+    print '3) Define origin point.'
+    print '4) Input lengths from each of the reference points to origin.'
+    print '5) Compute everything and displays image warps.'
+    print '6) Define interest points for the 3D model.'
+    print '7) Produce the VRML file.'
 
     while True:
         canvas = image.copy()
@@ -195,6 +225,82 @@ def main():
                     print 'Reference points definition not complete'
             else:
                 print 'Axis points definition not complete'
+
+        elif key == ord('i'):
+            select_interest_points = 'y'
+            three_d_points = []
+
+            texmap_name = raw_input('Input texture map name: ')
+            while select_interest_points.lower() == 'y':
+                line_mode = -3
+                if len(base_interest_point) > 0:
+                    del base_interest_point[-1]
+                print 'Select a base point.'
+                while len(base_interest_point) == 0:
+                    cv2.waitKey(1)
+                print 'Base point at %s' % (base_interest_point[0],)
+
+                line_mode = -4
+                if len(interest_point) > 0:
+                    del interest_point[-1]
+                print 'Select an interest point.'
+                while len(interest_point) == 0:
+                    cv2.waitKey(1)
+                print 'Added interest point at %s' % (interest_point[0],)
+
+                line1 = np.cross(base_interest_point[0], np.array([origin_point[0][0], origin_point[0][1], 1]))
+                
+                horizon = np.cross(V[1], V[0])
+                horizon = horizon/np.sqrt(horizon[0]**2 + horizon[1]**2)
+                
+                v = np.cross(line1, horizon)
+                v = np.divide(v, v[2])
+
+                line2 = np.cross(np.transpose(v), np.array([reference_points[2][0], reference_points[2][1], 1]))
+
+                vertical_line = np.cross(interest_point[0], base_interest_point[0])
+
+                t = np.cross(line2, vertical_line)
+                t = np.divide(t, t[2])
+
+                height = reference_length[2] \
+                        * np.sqrt(ssq(np.subtract(interest_point[0], base_interest_point[0]))) \
+                        * np.sqrt(ssq(np.subtract(np.transpose(V[2]), t))) \
+                        / np.sqrt(ssq(np.subtract(t, base_interest_point))) \
+                        / np.sqrt(ssq(np.subtract(V[2], interest_point[0])))
+                print 'Height: %s' % (height,)
+
+                V = compute_vanish_line(vanish_points, h, w)
+                a = compute_scale(V, reference_points, reference_length, origin_point[0], h, w)
+                O = np.array(origin_point[0] + (1,))[:, None]
+                aV = a * np.transpose(V)
+                P = np.hstack((aV, O))
+                
+                Hz = np.transpose([P[:,0], P[:,1], np.add(P[:,2]*height, P[:,3])])
+                pos = solve(Hz, interest_point[0])
+                three_d_points.append([pos[0]/pos[2], pos[1]/pos[2], height])
+                print '3D coordinates: %s' % (three_d_points[-1],)
+
+                add_more = raw_input('Continue adding points at the same height? (y/n) ')
+                while add_more.lower() == 'y':
+                    if len(interest_point) > 0:
+                        del interest_point[-1]
+                    print 'Select an interest point at the same height.'
+                    while len(interest_point) == 0:
+                        cv2.waitKey(1)
+                    pos = solve(Hz, interest_point[0])
+                    three_d_points.append([pos[0]/pos[2], pos[1]/pos[2], height])
+                    print '3D coordinates: %s' % (three_d_points[-1],)
+                    add_more = raw_input('Continue adding points at the same height? (y/n) ')
+
+                select_interest_points = raw_input('Add more interest points? (y/n) ')
+
+            print 'All 3D points added:'
+            print '\n'.join(str(point) for point in three_d_points)
+            line_mode = 0
+
+        elif key == ord('v'):
+            print 'a'
         #---#
 
         #---Utils---#
