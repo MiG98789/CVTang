@@ -9,12 +9,13 @@ import scipy.sparse.linalg as sla
 from numpy.linalg import norm
 from scipy.linalg import solve
 
-line_mode = 0 #1 for x, 2 for y, 3 for z, -1 for ref_points, -2 for origin, -3 for base_interest_point, -4 for interest_point
+line_mode = 0 #1 for x, 2 for y, 3 for z, -1 for ref_points, -2 for origin, -3 for interest_base_point, -4 for interest_height_point, -5 for interest_point
 vanish_points = [[], [], []]
 reference_points = []
 reference_length = []
 origin_point = []
-base_interest_point = []
+interest_base_point = []
+interest_height_point = []
 interest_point = []
 line_colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 point_colors = [(255, 255, 0), (255, 0, 255), (0, 255, 255)]
@@ -34,9 +35,12 @@ def mouse_callback(event, x, y, flags, prams):
             if len(origin_point) == 0:
                 origin_point.append((x, y))
         elif line_mode == -3:
-            if len(base_interest_point) == 0:
-                base_interest_point.append((x,y,1))
+            if len(interest_base_point) == 0:
+                interest_base_point.append((x,y,1))
         elif line_mode == -4:
+            if len(interest_height_point) == 0:
+                interest_height_point.append((x,y,1))
+        elif line_mode == -5:
             if len(interest_point) == 0:
                 interest_point.append((x,y,1))
         else:
@@ -52,9 +56,12 @@ def mouse_callback(event, x, y, flags, prams):
             if len(origin_point) > 0:
                 del origin_point[-1]
         elif line_mode == -3:
-            if len(base_interest_point) > 0:
-                del base_interest_point[-1]
-        elif line_mode == -3:
+            if len(interest_base_point) > 0:
+                del interest_base_point[-1]
+        elif line_mode == -4:
+            if len(interest_height_point) > 0:
+                del interest_height_point[-1]
+        elif line_mode == -5:
             if len(interest_point) > 0:
                 del interest_point[-1]
         elif len(vanish_points[line_mode - 1]) > 0:
@@ -126,7 +133,7 @@ def transform(image, H):
     return images
 
 def main():
-    global line_mode, vanish_points, reference_points, reference_length, origin_point, base_interest_point, interest_point
+    global line_mode, vanish_points, reference_points, reference_length, origin_point, interest_base_point, interest_height_point, interest_point
     image_file = sys.argv[1] if len(sys.argv) > 1 else 'lecture.jpg'
     image = cv2.imread(image_file)
     if image is None:
@@ -223,24 +230,32 @@ def main():
             three_d_points = []
             texture_points = []
 
-            while select_interest_points.lower() == 'y':
-                line_mode = -3
-                if len(base_interest_point) > 0:
-                    del base_interest_point[-1]
-                print 'Select a base point.'
-                while len(base_interest_point) == 0:
-                    cv2.waitKey(1)
-                print 'Base point at %s' % (base_interest_point[0],)
+            line_mode = -3
+            if len(interest_base_point) > 0:
+                del interest_base_point[-1]
+            print 'Select a base point.'
+            while len(interest_base_point) == 0:
+                cv2.waitKey(1)
+            print 'Base point at %s' % (interest_base_point[0],)
 
+            while select_interest_points.lower() == 'y':
                 line_mode = -4
+                if len(interest_height_point) > 0:
+                    del interest_height_point[-1]
+                print 'Select the interest height.'
+                while len(interest_height_point) == 0:
+                    cv2.waitKey(1)
+                print 'Added interest height at %s' % (interest_height_point[0],)
+
+                line_mode = -5
                 if len(interest_point) > 0:
                     del interest_point[-1]
-                print 'Select an interest point.'
+                print 'Select the interest point.'
                 while len(interest_point) == 0:
                     cv2.waitKey(1)
                 print 'Added interest point at %s' % (interest_point[0],)
 
-                line1 = np.cross(base_interest_point[0], np.array([origin_point[0][0], origin_point[0][1], 1]))
+                line1 = np.cross(interest_base_point[0], np.array([origin_point[0][0], origin_point[0][1], 1]))
                 
                 horizon = np.cross(V[1], V[0])
                 horizon = horizon/np.sqrt(horizon[0]**2 + horizon[1]**2)
@@ -250,16 +265,16 @@ def main():
 
                 line2 = np.cross(np.transpose(v), np.array([reference_points[2][0], reference_points[2][1], 1]))
 
-                vertical_line = np.cross(interest_point[0], base_interest_point[0])
+                vertical_line = np.cross(interest_height_point[0], interest_base_point[0])
 
                 t = np.cross(line2, vertical_line)
                 t = np.divide(t, t[2])
 
                 height = reference_length[2] \
-                        * np.sqrt(ssq(np.subtract(interest_point[0], base_interest_point[0]))) \
+                        * np.sqrt(ssq(np.subtract(interest_height_point[0], interest_base_point[0]))) \
                         * np.sqrt(ssq(np.subtract(np.transpose(V[2]), t))) \
-                        / np.sqrt(ssq(np.subtract(t, base_interest_point))) \
-                        / np.sqrt(ssq(np.subtract(V[2], interest_point[0])))
+                        / np.sqrt(ssq(np.subtract(t, interest_base_point[0]))) \
+                        / np.sqrt(ssq(np.subtract(V[2], interest_height_point[0])))
                 print 'Height: %s' % (height,)
 
                 V = compute_vanish_line(vanish_points, h, w)
@@ -294,12 +309,14 @@ def main():
             texture_file = raw_input('Input texture map file name: ')
             texture = cv2.imread(texture_file)
             if texture is None:
-                print 'Read image file failed'
+                print 'Read texture file failed'
                 sys.exit(1)
             
             texture_name = texture_file[::-1].split('.', 1)[-1].split('/')[0][::-1]
             texture_height, texture_width, _ = texture.shape
-            
+            print 'Texture height: %s' % (texture_height,)
+            print 'Texture width: %s' % (texture_width,)
+
             for three_d_point in three_d_points:
                 sys.stdout.write('Input texture map coordinates for %s: ' % (three_d_point,))
                 sys.stdout.flush()
@@ -315,7 +332,7 @@ def main():
             print '\n'.join(str(point) for point in texture_points)
 
             image_name = image_file[::-1].split('.', 1)[-1].split('/')[0][::-1]
-            wrl_file = 'model/' + image_name + '.txt'
+            wrl_file = image_name + '/' + image_name + '.txt'
             if not os.path.exists(wrl_file):
                 with open(wrl_file, 'w') as f:
                     f.write('#VRML V2.0 utf8\n\nCollision {\n collide FALSE\n children [\n ]\n }')
@@ -330,14 +347,14 @@ def main():
                 f.write(texture_name + '.gif')
                 f.write('"\n  }  \n  }\n   geometry IndexedFaceSet {\n   coord Coordinate {\n   point [\n')
                 for point in three_d_points:
-                    f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ' ' + str(point[2]) + ', \n')
+                    f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ' ' + str(point[2]) + ',\n')
                 f.write('\n   ]\n   }\n   coordIndex [\n    ')
                 for i in range(len(three_d_points)):
                     f.write(str(i) + ',')
                 f.write('-1')
                 f.write('\n   ]\n   texCoord TextureCoordinate {\n    point [\n')
                 for point in texture_points:
-                    f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ', \n')
+                    f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ',\n')
                 f.write('\n    ]\n   }\n   texCoordIndex [\n    ')
                 for i in range(len(texture_points)):
                     f.write(str(i) + ',')
@@ -354,7 +371,7 @@ def main():
             reference_points = []
             query_points = []
             origin_point = []
-            base_interest_point = []
+            interest_base_point = []
             interest_point = []
         elif key == ord(' '):
             stroke = 3 if stroke == 10 else 10
