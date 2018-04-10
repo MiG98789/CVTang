@@ -333,5 +333,71 @@ Collision {
    solid FALSE
   }
 }
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "laptop_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     25.0 15.0 1.0,
+     25.0 165.0 1.0,
+     110.0 165.0 1.0,
+     110.0 15.0 1.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "laptop_yz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     110.0 15.0 1.0,
+     110.0 165.0 1.0,
+     110.0 165.0 86.0,
+     110.0 15.0 86.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
  ] 
 }
