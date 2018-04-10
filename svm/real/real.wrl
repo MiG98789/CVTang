@@ -14,8 +14,8 @@ Collision {
    coord Coordinate {
    point [
      0.0 0.0 0.0,
-     0.0 300.0 0.0,
-     175.0 300.0 0.0,
+     0.0 350.0 0.0,
+     175.0 350.0 0.0,
      175.0 0.0 0.0
    ]
    }
@@ -127,6 +127,204 @@ Collision {
      0.0 0.0,
      1.0 0.0,
      1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "uperaser_yz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     55.0 190.0 0.0,
+     55.0 210.0 0.0,
+     55.0 210.0 20.0,
+     55.0 190.0 20.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "uperaser_xz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     55.0 190.0 0.0,
+     100.0 190.0 0.0,
+     100.0 190.0 20.0,
+     55.0 190.0 20.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "uperaser_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     55.0 190.0 20.0,
+     55.0 210.0 20.0,
+     100.0 210.0 20.0,
+     100.0 190.0 20.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "downeraser_xz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     65.0 255.0 0.0,
+     85.0 255.0 0.0,
+     85.0 255.0 17.0,
+     65.0 255.0 17.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "downeraser_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     65.0 255.0 17.0,
+     65.0 300.0 17.0,
+     85.0 300.0 17.0,
+     85.0 255.0 17.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "downeraser_yz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     65.0 255.0 0.0,
+     65.0 300.0 0.0,
+     65.0 300.0 17.0,
+     65.0 255.0 17.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
     ]
    }
    texCoordIndex [
