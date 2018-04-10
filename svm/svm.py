@@ -353,6 +353,9 @@ def main():
             vanish_points = [[], [], []]
             reference_points = []
             query_points = []
+            origin_point = []
+            base_interest_point = []
+            interest_point = []
         elif key == ord(' '):
             stroke = 3 if stroke == 10 else 10
 
