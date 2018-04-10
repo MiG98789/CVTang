@@ -51,6 +51,7 @@ COMP5421 Project 3
 ### Utils
 
 ```
+'q'         #Switch to line_mode 0
 'c'    	    #Clears all defined points
 'bksp' 	    #Clears CMD screen (only in linux env)
 'esc'  	    #Exits program

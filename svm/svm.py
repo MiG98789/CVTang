@@ -161,7 +161,7 @@ def main():
 
         #---Specify plane---#
         if key >= ord('x') and key <= ord('z'):
-            line_mode = key - ord('x')
+            line_mode = key - ord('x') + 1
 
         elif key == ord('r'):
             line_mode = -1
@@ -347,6 +347,8 @@ def main():
         #---#
 
         #---Utils---#
+        elif key == ord('q'):
+            line_mode = 0
         elif key == ord('c'):
             vanish_points = [[], [], []]
             reference_points = []
