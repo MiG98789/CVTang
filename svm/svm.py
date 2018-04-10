@@ -126,7 +126,7 @@ def transform(image, H):
     return images
 
 def main():
-    global line_mode, vanish_points, reference_points, reference_length, origin_point
+    global line_mode, vanish_points, reference_points, reference_length, origin_point, base_interest_point, interest_point
     image_file = sys.argv[1] if len(sys.argv) > 1 else 'lecture.jpg'
     image = cv2.imread(image_file)
     if image is None:
