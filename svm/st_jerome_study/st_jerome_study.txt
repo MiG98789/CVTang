@@ -1,0 +1,273 @@
+#VRML V2.0 utf8
+
+Collision {
+ collide FALSE
+ children [
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "arch_xz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     0.0 0.0 0.0,
+     140.0 0.0 0.0,
+     140.0 0.0 200.0,
+     0.0 0.0 200.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0,
+     0.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "table_xz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     120.0 95.0 26.0,
+     135.0 95.0 26.0,
+     135.0 95.0 45.0,
+     120.0 95.0 45.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0,
+     0.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "table_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     120.0 95.0 45.0,
+     135.0 95.0 45.0,
+     135.0 130.0 45.0,
+     120.0 130.0 45.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "table_yz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     120.0 95.0 26.0,
+     120.0 130.0 26.0,
+     120.0 130.0 45.0,
+     120.0 95.0 45.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     1.0 0.0,
+     0.0 0.0,
+     0.0 1.0,
+     1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "staircase_xz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     10.0 70.0 0.0,
+     80.0 70.0 0.0,
+     80.0 70.0 26.0,
+     10.0 70.0 26.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0,
+     0.0 1.0,
+
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "staircase_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     10.0 70.0 26.0,
+     10.0 88.0 26.0,
+     66.0 88.0 26.0,
+     66.0 70.0 26.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "lowerfloor_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     10.0 0.0 0.0,
+     10.0 85.0 0.0,
+     130.0 85.0 0.0,
+     130.0 0.0 0.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "upperfloor_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [ 
+     55.0 88.0 26.0,
+     55.0 135.0 26.0,
+     135.0 135.0 26.0,
+     135.0 88.0 26.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0,
+     0.0 1.0,
+
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+ ] 
+}
