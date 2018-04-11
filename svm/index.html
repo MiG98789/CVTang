@@ -90,11 +90,11 @@
 
         <br>
         <h2>Step 3: Calculating Homography</h2>
-        <p>The homography matrix is simply defined by H = [a_xV_x, a_yV_y, a_zV_z, O], where a_i and V_i are the scale and vanishing
+        <p>The homography matrix is simply defined by H = [a<sub>x</sub>V<sub>x</sub>, a<sub>y</sub>V<sub>y</sub>, a<sub>z</sub>V<sub>z</sub>, O], where a<sub>i</sub> and V<sub>i</sub> are the scale and vanishing
             point of the i-th axis, and O is the defined origin point in Step 2. For image warping purpose, the homography
             matrix on each of the xy, yz, xz plane are extracted by taking the corresponding column plus the last column.
-            e.g. To obtain the xy homography matrix, we take the first, second and forth column to form a new matrix H_xy
-            = [a_xV_x, a_yV_y, O].
+            e.g. To obtain the xy homography matrix, we take the first, second and forth column to form a new matrix H<sub>xy</sub>
+            = [a<sub>x</sub>V<sub>x</sub>, a<sub>y</sub>V<sub>y</sub>, O].
         </p>
 
         <br>
@@ -128,7 +128,7 @@
 
             <br>
             <br>Fourth, select an interest point r at z=h, and recalculate the homography matrix using the planar perspective
-            map Hz = [a_xV_x a_yV_y chV_z+O] to obtain new (x,y) coordinates that are relative to the origin. This gives
+            map Hz = [a<sub>x</sub>V<sub>x</sub> a<sub>y</sub>V<sub>y</sub> chV<sub>z</sub>+O] to obtain new (x,y) coordinates that are relative to the origin. This gives
             the 3D coordinates of that particular interest point (x,y,h).
 
             <br>
