@@ -332,7 +332,7 @@ def main():
             print '\n'.join(str(point) for point in texture_points)
 
             image_name = image_file[::-1].split('.', 1)[-1].split('/')[0][::-1]
-            wrl_file = image_name + '/' + image_name + '.txt'
+            wrl_file = image_name + '/' + image_name + '.wrl'
             if not os.path.exists(wrl_file):
                 with open(wrl_file, 'w') as f:
                     f.write('#VRML V2.0 utf8\n\nCollision {\n collide FALSE\n children [\n ]\n }')
