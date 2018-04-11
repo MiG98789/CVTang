@@ -1,0 +1,106 @@
+#VRML V2.0 utf8
+
+Collision {
+ collide FALSE
+ children [
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "bellcaseup_xz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     0.0 0.0 0.0,
+     404.0 0.0 0.0,
+     404.0 0.0 400.0,
+     0.0 0.0 400.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "bellcaseup_xy.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     0.0 0.0 400.0,
+     0.0 1030.0 400.0,
+     404.0 1030.0 400.0,
+     404.0 0.0 400.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     0.0 0.0,
+     1.0 0.0,
+     1.0 1.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+
+ Shape {
+  appearance Appearance {
+   texture ImageTexture {
+   url "bellcaseup_yz.gif"
+  }  
+  }
+   geometry IndexedFaceSet {
+   coord Coordinate {
+   point [
+     0.0 0.0 0.0,
+     0.0 1030.0 0.0,
+     0.0 1030.0 400.0,
+     0.0 0.0 400.0
+   ]
+   }
+   coordIndex [
+    0,1,2,3,-1
+   ]
+   texCoord TextureCoordinate {
+    point [
+     0.0 1.0,
+     1.0 1.0,
+     1.0 0.0,
+     0.0 0.0
+    ]
+   }
+   texCoordIndex [
+    0,1,2,3,-1
+   ]
+   solid FALSE
+  }
+}
+ ] 
+}
