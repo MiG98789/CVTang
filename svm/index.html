@@ -83,10 +83,9 @@
 
         <br>
         <h2>Step 2: Compute Scale</h2>
-        <p>We allow users to define three reference points and one origin point on the image. The reference points and the
-            origin form parallel lines along the three axes. Then, users are prompted to enter the respective physical world
-            lengths of the reference points from origin. Using the provided information, the scale along each axis can be
-            calculated.
+        <p>We allow users to define three reference points and one origin point on the image. The reference points and the origin
+            form parallel lines along the three axes. Then, users are prompted to enter the respective physical world lengths
+            of the reference points from origin. Using the provided information, the scale along each axis can be calculated.
         </p>
 
         <br>
@@ -105,7 +104,8 @@
 
         <br>
         <h2>Step 5: Retrieve Texture Maps</h2>
-        <p>Generalising to more complex images with more than 3 surfaces (i.e. not a cuboid), carry out steps 1-4 with the origin and reference points along a shape repeatedly to get the xy, yz, yz texture maps of that shape.
+        <p>Generalising to more complex images with more than 3 surfaces (i.e. not a cuboid), carry out steps 1-4 with the origin
+            and reference points along a shape repeatedly to get the xy, yz, yz texture maps of that shape.
 
         </p>
 
@@ -113,20 +113,32 @@
         <h2>Step 6: Calculate Interest Points</h2>
         <p>
             After retrieving texture maps, the actual 3D coordinates of that texture map should be calculated.
-            
-            <br>First, define the origin point O again, where all 3D coordinates will be calculated relative to that origin point. O should not be changed when calculating all the texture maps' 3D coordinates, and O's 3D coordinates is (0,0,0). That is, O lies on the z=0 plane.
-            
-            <br>Second, choose a base point b on the z=0 plane, which should correspond to the one of the points of the projection of the texture map onto the z=0 plane.
-
-            <br>Third, choose a height z=h, which will be used for all proceeding interest points selected.
-
-            <br>Fourth, select an interest point r at z=h, and recalculate the homography matrix using the planar perspective map Hz = [a_xV_x a_yV_y chV_z+O] to obtain new (x,y) coordinates that are relative to the origin. This gives the 3D coordinates of that particular interest point (x,y,h).
-
-            <br>Repeat the second to fourth steps to obtain the 3D coordinates of the other interest points of the texture map.
 
             <br>
-            <h2>Step 7: 3D VRML Model Generation</h2>
-            After getting all the interest points of a texture map, the corresponding coordinates of those interest points on the texture map image need to be selected to know how to transform the texture map with respect to the interest points.
+            <br>First, define the origin point O again, where all 3D coordinates will be calculated relative to that origin point.
+            O should not be changed when calculating all the texture maps' 3D coordinates, and O's 3D coordinates is (0,0,0).
+            That is, O lies on the z=0 plane.
+
+            <br>
+            <br>Second, choose a base point b on the z=0 plane, which should correspond to the one of the points of the projection
+            of the texture map onto the z=0 plane.
+
+            <br>
+            <br>Third, choose a height z=h, which will be used for all proceeding interest points selected.
+
+            <br>
+            <br>Fourth, select an interest point r at z=h, and recalculate the homography matrix using the planar perspective
+            map Hz = [a_xV_x a_yV_y chV_z+O] to obtain new (x,y) coordinates that are relative to the origin. This gives
+            the 3D coordinates of that particular interest point (x,y,h).
+
+            <br>
+            <br>Repeat the second to fourth steps to obtain the 3D coordinates of the other interest points of the texture map.</p>
+
+        <br>
+        <h2>Step 7: 3D VRML Model Generation</h2>
+        <p>
+            After getting all the interest points of a texture map, the corresponding coordinates of those interest points on the texture
+            map image need to be selected to know how to transform the texture map with respect to the interest points.
         </p>
 
         <hr>
@@ -231,7 +243,7 @@
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th class="col-md-3">Name</th>
+                    <th class="col-md-1">Name</th>
                     <th>Source Image</th>
                     <th>VRML Model</th>
                 </tr>
@@ -244,7 +256,9 @@
                     <td>
                         <img src="real.jpg" width="50%">
                     </td>
-                    <td></td>
+                    <td>
+                        <img src="results/real.png" width="100%">
+                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -253,7 +267,9 @@
                     <td>
                         <img src="st_jerome_study.jpg" width="50%">
                     </td>
-                    <td></td>
+                    <td>
+                        <img src="results/st_jerome_study.png" width="100%">
+                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -265,7 +281,9 @@
                         <br>
                         <img src="bellcasedown.jpg" width="50%">
                     </td>
-                    <td></td>
+                    <td>
+                        <img src="results/bellcase.gif" width="50%">
+                    </td>
                 </tr>
             </tbody>
         </table>
