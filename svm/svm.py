@@ -344,7 +344,10 @@ def main():
                     f.write(line)
             with open(wrl_file, 'a') as f:
                 f.write('\n Shape {\n  appearance Appearance {\n   texture ImageTexture {\n   url "')
-                f.write(texture_name + '.gif')
+                if texture_file.endswith('.bmp', len(texture_file) - 4, len(texture_file)):
+		    f.write(texture_name + '.bmp')
+                else:
+                    f.write(texture_name + '.gif')
                 f.write('"\n  }  \n  }\n   geometry IndexedFaceSet {\n   coord Coordinate {\n   point [\n')
                 for point in three_d_points:
                     f.write('     ' + str(point[0]) + ' ' + str(point[1]) + ' ' + str(point[2]) + ',\n')
