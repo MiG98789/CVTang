@@ -82,12 +82,14 @@ def resample(images, lights):
              [6, 1,10], [9,0,11], [9,11,2], [ 9,2,5], [7,2,11]]
 
     #Subdivides faces
-    for i in range(3):
+    for i in range(4):
         verts, faces = subdivide(verts, faces)
     
+    Los = np.array(verts)
+    Los = Los[Los[:,2] >= 0]
     L = lights
     imgs = []
-    for Lo in np.array(verts):
+    for Lo in Los:
         #Finds closest lights
         V = np.argpartition(np.linalg.norm(L-Lo, axis = 1), 3)[:3]
 
@@ -96,7 +98,7 @@ def resample(images, lights):
         Io = [np.dot(Lo, L[i])/denom * images[i] for i in V]
         imgs.append(np.sum(Io, axis = 0).astype(np.uint8))
 
-    return np.array(imgs), np.array(verts)
+    return np.array(imgs), Los
    
 def denom_image(images, lights):
     n, h, w, c = images.shape
@@ -153,7 +155,7 @@ def main():
 
     images, lights = resample(images, lights)
     images, lights = denom_image(images, lights)
-
+    
     normal = estimate_normal(images, lights)
 
 if __name__ == "__main__":
