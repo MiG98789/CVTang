@@ -20,8 +20,13 @@ def load_image(dirname):
     dirs = [x for x in dirs if 'image' in x]
 
     images = [cv2.imread(dirname + '/' + d) for d in dirs]
+    images = np.array(images)
 
-    return np.array(images)
+    size = images.shape
+
+    images = [cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten() for img in images]
+
+    return np.array(images), size
 
 def vis_light(lights):
     fig = plt.figure()
@@ -96,29 +101,26 @@ def resample(images, lights):
         #Interpolates images from closest lights
         denom = np.sum([np.dot(Lo, L[i]) for i in V])
         Io = [np.dot(Lo, L[i])/denom * images[i] for i in V]
-        imgs.append(np.sum(Io, axis = 0).astype(np.uint8))
+        imgs.append(np.sum(Io, axis = 0))
 
     return np.array(imgs), Los
    
 def denom_image(images, lights):
-    n, h, w, c = images.shape
-    images = images.reshape(n, -1, c)
-
     #sorted images
     sorted_img = np.sort(images, axis=0)
     
     #get L H threshold
-    L = np.percentile(sorted_img, 70, axis=0).reshape(1, -1, c)
+    L = np.percentile(sorted_img, 70, axis=0)
     H = np.percentile(sorted_img, 90, axis=(0,1))
 
     #find images that satisfy kiL > L
-    cond = np.all(images - L > 0, axis = 2)
+    cond = images - L > 0
 
     #get kiL and riL
     kiL = np.sum(cond, axis=1)
-    riL = (images - L)*cond[:,:,None]
+    riL = (images - L)*cond
     bot = np.count_nonzero(riL, axis=1)
-    riL = np.divide(np.sum(riL, axis=1), bot, where=bot!=0)
+    riL = np.divide(np.sum(riL, axis=1), bot)
 
     #Finds denominator image that maximizes k and has r < H
     cond = np.zeros(kiL.shape)
@@ -128,35 +130,43 @@ def denom_image(images, lights):
     denom_img = images[index]
     denom_lit = lights[index]
  
-    images = np.divide(images, denom_img, where = denom_img!=0)
-    images = np.delete(images, index, axis=0).reshape(-1, h, w, c)
-
-    lights = np.divide(lights, denom_lit, where = denom_lit!=0)
+    images = np.divide(images, denom_img)
+    images = np.delete(images, index, axis=0)
     lights = np.delete(lights, index, axis=0)
 
-    return images, lights
+    return images, lights, denom_lit
 
 def estimate_normal(images, lights):
-    imgray = [cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) for img in images]
-    imgray = [img.flatten() for img in imgray]
-    imgray = np.array(imgray)
-
-    G, _, _, _ = np.linalg.lstsq(lights, imgray, rcond=None)
+    G, _, _, _ = np.linalg.lstsq(lights, images, rcond=None)
     G = G.T
 
     kd = np.linalg.norm(G, axis = 1)
     N = G / kd[:, None]
+
     return N
 
 def main():
     data_path = 'data02'
     lights = load_light(data_path)
-    images = load_image(data_path)
+    images, size = load_image(data_path)
 
     images, lights = resample(images, lights)
-    images, lights = denom_image(images, lights)
+    images, lights, denom_light = denom_image(images, lights)
     
     normal = estimate_normal(images, lights)
+
+    normal = normal.reshape(size[1:])
+
+    print normal, normal.shape
+
+    cv2.imshow('xb', normal[:,:,0])
+    cv2.imshow('yb', normal[:,:,1])
+    cv2.imshow('zb', normal[:,:,2])
+
+    cv2.imshow('x', cv2.applyColorMap((255*normal[:,:,0]).astype(np.uint8), cv2.COLORMAP_JET))
+    cv2.imshow('y', cv2.applyColorMap((255*normal[:,:,1]).astype(np.uint8), cv2.COLORMAP_JET))
+    cv2.imshow('z', cv2.applyColorMap((255*normal[:,:,2]).astype(np.uint8), cv2.COLORMAP_JET))
+    while cv2.waitKey(0) & 0xff != ord('q'): pass
 
 if __name__ == "__main__":
     main()
