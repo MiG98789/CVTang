@@ -42,6 +42,27 @@ def vis_poly(verts, faces):
     ax.scatter(verts[:,0], verts[:,1], verts[:,2])
     plt.show()
 
+def vis_normal(normal, size):
+    normal = normal.reshape(size[1:])
+    
+    normal[:,:,0] -= np.min(normal[:,:,0])
+    normal[:,:,1] -= np.min(normal[:,:,1])
+    normal[:,:,2] -= np.min(normal[:,:,2])
+
+    normal[:,:,0] *= 255/np.max(normal[:,:,0])
+    normal[:,:,1] *= 255/np.max(normal[:,:,1])
+    normal[:,:,2] *= 255/np.max(normal[:,:,2])
+
+    nx = cv2.applyColorMap(normal[:,:,0].astype(np.uint8), cv2.COLORMAP_JET)
+    ny = cv2.applyColorMap(normal[:,:,1].astype(np.uint8), cv2.COLORMAP_JET)
+    nz = cv2.applyColorMap(normal[:,:,2].astype(np.uint8), cv2.COLORMAP_JET)
+
+    canvas = np.hstack((nx, ny, nz))
+    canvas = cv2.resize(canvas, None, fx=2, fy=2)
+
+    cv2.imshow(' ', canvas)
+    cv2.waitKey(0)
+
 def subdivide(verts, faces):
     def normalize(v1, v2):
         v = [v1[x]/2. + v2[x]/2. for x in range(len(v1))]
@@ -142,7 +163,6 @@ def estimate_normal(images, lights):
 
     kd = np.linalg.norm(G, axis = 1)
     N = G / kd[:, None]
-
     return N
 
 def main():
@@ -155,18 +175,7 @@ def main():
     
     normal = estimate_normal(images, lights)
 
-    normal = normal.reshape(size[1:])
-
-    print normal, normal.shape
-
-    cv2.imshow('xb', normal[:,:,0])
-    cv2.imshow('yb', normal[:,:,1])
-    cv2.imshow('zb', normal[:,:,2])
-
-    cv2.imshow('x', cv2.applyColorMap((255*normal[:,:,0]).astype(np.uint8), cv2.COLORMAP_JET))
-    cv2.imshow('y', cv2.applyColorMap((255*normal[:,:,1]).astype(np.uint8), cv2.COLORMAP_JET))
-    cv2.imshow('z', cv2.applyColorMap((255*normal[:,:,2]).astype(np.uint8), cv2.COLORMAP_JET))
-    while cv2.waitKey(0) & 0xff != ord('q'): pass
+    vis_normal(normal, size)
 
 if __name__ == "__main__":
     main()
