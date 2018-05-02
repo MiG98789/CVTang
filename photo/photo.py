@@ -42,7 +42,13 @@ def vis_poly(verts, faces):
     ax.scatter(verts[:,0], verts[:,1], verts[:,2])
     plt.show()
 
-def vis_normal(normal, size):
+def vis_normal(norm, size):
+    
+    normal = norm.copy()
+
+    L = np.ones(3)/3**0.5
+    NL = np.dot(normal, L).reshape(size[1:3])
+
     normal = normal.reshape(size[1:])
     
     normal[:,:,0] -= np.min(normal[:,:,0])
@@ -57,14 +63,11 @@ def vis_normal(normal, size):
     ny = cv2.applyColorMap(normal[:,:,1].astype(np.uint8), cv2.COLORMAP_JET)
     nz = cv2.applyColorMap(normal[:,:,2].astype(np.uint8), cv2.COLORMAP_JET)
 
-    cv2.imshow('nx', nx)
-    cv2.imshow('ny', ny)
-    cv2.imshow('nz', nz)
-
     canvas = np.hstack((nx, ny, nz))
     canvas = cv2.resize(canvas, None, fx=2, fy=2)
 
     cv2.imshow(' ', canvas)
+    cv2.imshow('NL', NL)
     cv2.waitKey(0)
 
 def subdivide(verts, faces):
@@ -178,10 +181,8 @@ def main():
     images, lights, denom_light = denom_image(images, lights)
     
     normal = estimate_normal(images, lights)
-
+    np.savetxt("normal.csv", normal, delimiter=",")
     vis_normal(normal, size)
-    np.savetxt("normal1.csv", normal, delimiter=",")
-    np.savetxt("normal2.csv", np.transpose(normal), delimiter=",")
 
 if __name__ == "__main__":
     main()
