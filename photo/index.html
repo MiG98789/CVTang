@@ -81,14 +81,25 @@
         <br>
         <br>
         <h1>Minimization via Graph Cuts</h1>
+        <img src="refined.jpg">
+        <br>
+        <br>
         After getting the normal map of the object, they can be refined by performing max flow-min cut to provide a graph cut. In
         this case, the graph is constructed by having each vertex in the graph as a pixel of the normal map, and the edge
-        cost for edges connecting two vertices is the energy function as described in the provided paper.
+        cost for edges connecting two vertices is the energy function as described in the <a href="https://course.cse.ust.hk/comp5421/Password_Only/projects/photo/01467260.pdf">provided paper</a>.
         <br>
         <br> From the normal map, n possible normals are retrieved by subdividing the normal map using an icosahedron. Then,
         construct the graph based on the method described in the provided paper, where edge costs are the energy function
         which is to be minimised. Then, perform graph cut n times on the graph, where each cut gets the set of pixels which
         should be assigned to each normal.
+
+        <br>
+        <br>
+        <h1>3D Reconstruction</h1>
+        <img src="3d.jpg">
+        <br>
+        <br>
+        3D reconstruction was done using <a href="http://www.peterkovesi.com/matlabfns/">Shape From Shapelets</a>.
     </div>
 </body>
 
