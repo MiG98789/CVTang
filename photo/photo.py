@@ -179,7 +179,7 @@ def estimate_normal(images, lights):
     return N
 
 def main():
-    data_path = 'data02'
+    data_path = 'data09'
     lights = load_light(data_path)
     images, size = load_image(data_path)
 
@@ -187,7 +187,7 @@ def main():
     images, lights, denom_light = denom_image(images, lights)
     
     normal = estimate_normal(images, lights)
-    np.savetxt("normal.csv", normal, delimiter=",")
+    np.savetxt("NL.csv", normal, delimiter=",")
     vis_normal(normal, size)
 
 if __name__ == "__main__":
