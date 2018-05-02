@@ -179,7 +179,7 @@ def estimate_normal(images, lights):
     return N
 
 def main():
-    data_path = 'data09'
+    data_path = 'data02'
     lights = load_light(data_path)
     images, size = load_image(data_path)
 
