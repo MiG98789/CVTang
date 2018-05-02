@@ -68,6 +68,12 @@ def vis_normal(norm, size):
 
     cv2.imshow(' ', canvas)
     cv2.imshow('NL', NL)
+    
+    NL = (255*NL).astype(np.uint8)
+
+    cv2.imwrite('vis.jpg', canvas)
+    cv2.imwrite('NL.jpg', NL)
+
     cv2.waitKey(0)
 
 def subdivide(verts, faces):
