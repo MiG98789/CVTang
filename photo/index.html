@@ -14,7 +14,7 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-	<link rel="icon" href="../resources/comp5421-logo.gif">
+    <link rel="icon" href="../resources/comp5421-logo.gif">
 
     <style>
         body {
@@ -54,6 +54,41 @@
             <br>
             <p>CHIU, Man Tik | DEL MUNDO, Gian Miguel Sero</p>
         </div>
+    </div>
+
+    <div class="container container-fluid bg-3">
+        <h1>Uniform Resampling</h1>
+        To avoid using unevenly scattered light and image scenes, images and lights are uniformly resampling using a subdivided icosahedron.
+        First, an icosahedron is defined using the standard method with the Golden Ratio. Then, we subdivide each face by
+        linking the 3 midpoints. Next, we interpolate collected images according to the collected lights that are cloest
+        to each icosahedron vertex. This results in a uniformly resampled image set with uniform lighting.
+
+        <br>
+        <br>
+        <h1>Denominator Image</h1>
+        Finding the denominator image allows us to solve the light equation without considering the lambertian value. To do this,
+        we find an image in the collected set that has the highest mean rank riL among its pixels, while satisfying riL less
+        than 90% threshold H and have intensity rank> 70% threshold L. The found image should be free from shadows highlights.
+
+        <br>
+        <br>
+        <h1>Local Normal Estimation</h1>
+        <img src="vis.jpg">
+        <br>
+        <br> The initial light estimation is done by solving the equation I=NL. By having more than 3 sample images and light
+        pairs, we can then find the least square solution, which is the estimated normal map of the object.
+
+        <br>
+        <br>
+        <h1>Minimization via Graph Cuts</h1>
+        After getting the normal map of the object, they can be refined by performing max flow-min cut to provide a graph cut. In
+        this case, the graph is constructed by having each vertex in the graph as a pixel of the normal map, and the edge
+        cost for edges connecting two vertices is the energy function as described in the provided paper.
+        <br>
+        <br> From the normal map, n possible normals are retrieved by subdividing the normal map using an icosahedron. Then,
+        construct the graph based on the method described in the provided paper, where edge costs are the energy function
+        which is to be minimised. Then, perform graph cut n times on the graph, where each cut gets the set of pixels which
+        should be assigned to each normal.
     </div>
 </body>
 
