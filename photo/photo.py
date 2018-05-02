@@ -57,6 +57,10 @@ def vis_normal(normal, size):
     ny = cv2.applyColorMap(normal[:,:,1].astype(np.uint8), cv2.COLORMAP_JET)
     nz = cv2.applyColorMap(normal[:,:,2].astype(np.uint8), cv2.COLORMAP_JET)
 
+    cv2.imshow('nx', nx)
+    cv2.imshow('ny', ny)
+    cv2.imshow('nz', nz)
+
     canvas = np.hstack((nx, ny, nz))
     canvas = cv2.resize(canvas, None, fx=2, fy=2)
 
