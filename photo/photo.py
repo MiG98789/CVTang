@@ -180,6 +180,8 @@ def main():
     normal = estimate_normal(images, lights)
 
     vis_normal(normal, size)
+    np.savetxt("normal1.csv", normal, delimiter=",")
+    np.savetxt("normal2.csv", np.transpose(normal), delimiter=",")
 
 if __name__ == "__main__":
     main()
