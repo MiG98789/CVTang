@@ -20,6 +20,10 @@
         body {
             font-size: 20px;
         }
+
+        .refined {
+            transform: scaleX(-1);
+        }
     </style>
 </head>
 
@@ -73,18 +77,14 @@
         <br>
         <br>
         <h1>Local Normal Estimation</h1>
-        <img src="vis.jpg">
-        <br>
-        <br> The initial light estimation is done by solving the equation I=NL. By having more than 3 sample images and light
-        pairs, we can then find the least square solution, which is the estimated normal map of the object.
+        The initial light estimation is done by solving the equation I=NL. By having more than 3 sample images and light pairs, we
+        can then find the least square solution, which is the estimated normal map of the object.
 
         <br>
         <br>
         <h1>Minimization via Graph Cuts</h1>
-        <img src="refined.jpg">
-        <br>
-        <br>
-        The normals are refined as described in the <a href="https://course.cse.ust.hk/comp5421/Password_Only/projects/photo/01467260.pdf">provided paper</a>.
+        The normals are refined as described in the
+        <a href="https://course.cse.ust.hk/comp5421/Password_Only/projects/photo/01467260.pdf">provided paper</a>.
         <br>
         <br> From the normal map, n possible normals are retrieved by subdividing the normal map using an icosahedron. Then,
         construct the graph based on the method described in the provided paper, where edge costs are the energy function
@@ -94,10 +94,132 @@
         <br>
         <br>
         <h1>3D Reconstruction</h1>
-        <img src="3d.jpg">
+        3D reconstruction was done using
+        <a href="http://www.peterkovesi.com/matlabfns/">Shape From Shapelets</a>.
+
         <br>
         <br>
-        3D reconstruction was done using <a href="http://www.peterkovesi.com/matlabfns/">Shape From Shapelets</a>.
+        <h1>Results</h1>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="col-md-3">Data Number</th>
+                    <th>Normalised</th>
+                    <th>Refined</th>
+                    <th>3D</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>data02</td>
+                    <td>
+                        <img src="results/NL02.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL02_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL02_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data03</td>
+                    <td>
+                        <img src="results/NL03.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL03_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL03_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data04</td>
+                    <td>
+                        <img src="results/NL04.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL04_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL04_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data05</td>
+                    <td>
+                        <img src="results/NL05.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL05_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL05_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data06</td>
+                    <td>
+                        <img src="results/NL06.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL06_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL06_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data07</td>
+                    <td>
+                        <img src="results/NL07.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL07_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL07_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data08</td>
+                    <td>
+                        <img src="results/NL08.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL08_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL08_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data09</td>
+                    <td>
+                        <img src="results/NL09.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL09_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL09_3d.jpg">
+                    </td>
+                </tr>
+                <tr>
+                    <td>data10</td>
+                    <td>
+                        <img src="results/NL10.jpg">
+                    </td>
+                    <td>
+                        <img src="results/NL10_refined.jpg" class="refined">
+                    </td>
+                    <td>
+                        <img src="results/NL10_3d.jpg">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 
